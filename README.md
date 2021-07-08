@@ -1,5 +1,7 @@
 # pyheatintegration
 
+[![Test](https://github.com/tarao1006/pyheatintegration/actions/workflows/test.yml/badge.svg)](https://github.com/tarao1006/pyheatintegration/actions/workflows/test.yml)
+
 ヒートインテグレーションを支援します。
 
 ## Requirements
