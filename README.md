@@ -12,6 +12,10 @@
 pip install pyheatintegration
 ```
 
+## Examples
+
+- [simple example](./examples/simple)
+
 ## Documentation
 
 https://pyheatintegration.readthedocs.io/en/latest/
