@@ -11,6 +11,10 @@ Installation
 
    pip install pyheatintegration
 
+Examples
+========
+
+* `simple example <https://github.com/tarao1006/pyheatintegration/blob/19d6eda58a58e8c4ae0b3e15726297773e0a546c/examples/simple/main.py>`_
 
 Getting Started
 ===============
@@ -235,12 +239,6 @@ Details
    plot_segment
    segment
    temperature_range
-
-Examples
-========
-
-
-
 
 Indices and tables
 ==================
