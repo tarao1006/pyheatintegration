@@ -1,0 +1,5 @@
+input_temperature,output_temperature,heat_flow,type,cost
+40.0,90.0,150.0,1,0
+80.0,110.0,180.0,1,0
+125.0,80.0,160.0,2,0
+100.0,60.0,160.0,2,0
