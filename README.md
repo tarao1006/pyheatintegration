@@ -45,7 +45,7 @@ pip install pyheatintegration
 
 ## Documentation
 
-https://pyheatintegration.readthedocs.io/en/latest/
+https://pyheatintegration.readthedocs.io/ja/latest/
 
 ## License
 
