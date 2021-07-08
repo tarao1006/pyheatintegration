@@ -66,3 +66,5 @@ html_static_path = ['_static']
 html_css_files = [
     'custom.css'
 ]
+
+html_logo = "./images/logo-120x120.png"
