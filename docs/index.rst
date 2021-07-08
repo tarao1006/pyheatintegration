@@ -127,7 +127,7 @@ Getting Started
 Details
 =======
 
-熱交換を行いたい流体の情報を元に、 ``Stream`` のリストをを生成します。
+熱交換を行いたい流体の情報を元に、 ``Stream`` のリストを生成します。
 
 .. code-block:: python
 
