@@ -8,7 +8,8 @@ from .heat_range import (REL_TOL_DIGIT, HeatRange, get_detailed_heat_ranges,
 from .plot_segment import PlotSegment, get_plot_segments, is_continuous
 from .segment import Segment, Segments
 from .stream import Stream, get_temperature_range_heats
-from .temperature_range import accumulate_heats, get_temperatures
+from .temperature_range import (TemperatureRange, accumulate_heats,
+                                get_temperatures)
 
 
 def _create_composite_curve(streams: list[Stream]) -> list[PlotSegment]:
@@ -284,9 +285,9 @@ def _merge_segments(
     return sorted(hot_plot_segments), sorted(cold_plot_segments)
 
 
-def get_possible_minimum_temp_diff(
+def get_possible_minimum_temp_diff_range(
     streams: list[Stream]
-) -> float:
+) -> TemperatureRange:
     """設定可能な最小接近温度差を返します。
 
     Args:
@@ -308,6 +309,27 @@ def get_possible_minimum_temp_diff(
         raise RuntimeError('与熱流体は少なくとも1つは指定する必要があります。')
     if not cold_streams:
         raise RuntimeError('受熱流体は少なくとも1つは指定する必要があります。')
+
+    hot_maximum_temp = max(
+        stream.input_temperature() for stream in streams if stream.is_hot()
+    )
+
+    hot_minimum_temp = min(
+        stream.output_temperature() for stream in streams if stream.is_hot()
+    )
+
+    cold_maximum_temp = max(
+        stream.output_temperature() for stream in streams if stream.is_cold()
+    )
+
+    cold_minimum_temp = min(
+        stream.input_temperature() for stream in streams if stream.is_cold()
+    )
+
+    maximum_minimum_approch_temp_diff = min(
+        hot_maximum_temp - cold_maximum_temp,
+        hot_minimum_temp - cold_minimum_temp
+    )
 
     # 与熱流体と受熱流体のセグメントを得る。
     initial_hcc = _create_composite_curve(hot_streams)
@@ -351,7 +373,7 @@ def get_possible_minimum_temp_diff(
         for plot_segment in get_plot_segments(heat_ranges, ccc)
     }
 
-    min_temp_diff = math.inf
+    minimum_minimum_approch_temp_diff = math.inf
     for heat_range in heat_ranges:
         hot_plot_segment = hot_heat_range_plot_segment.get(heat_range, None)
         cold_plot_segment = cold_heat_range_plot_segment.get(heat_range, None)
@@ -362,13 +384,16 @@ def get_possible_minimum_temp_diff(
         hot_start_temp, hot_finish_temp = hot_plot_segment.temperatures()
         cold_start_temp, cold_finish_temp = cold_plot_segment.temperatures()
 
-        min_temp_diff = min(
-            min_temp_diff,
+        minimum_minimum_approch_temp_diff = min(
+            minimum_minimum_approch_temp_diff,
             hot_start_temp - cold_start_temp,
             hot_finish_temp - cold_finish_temp
         )
 
-    return min_temp_diff
+    return TemperatureRange(
+        maximum_minimum_approch_temp_diff,
+        minimum_minimum_approch_temp_diff
+    )
 
 
 class TQDiagram:
