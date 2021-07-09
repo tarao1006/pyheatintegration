@@ -35,15 +35,25 @@ class PinchAnalyzer:
 
         streams = deepcopy(streams)
 
-        minimum_temp = min(
-            stream.input_temperature()
-            for stream in streams
-            if stream.is_internal() and stream.is_cold()
+        hot_maximum_temp = max(
+            stream.input_temperature() for stream in streams if stream.is_hot()
         )
-        maximum_temp = max(
-            stream.input_temperature()
-            for stream in streams
-            if stream.is_internal() and stream.is_hot()
+
+        hot_minimum_temp = min(
+            stream.output_temperature() for stream in streams if stream.is_hot()
+        )
+
+        cold_maximum_temp = max(
+            stream.output_temperature() for stream in streams if stream.is_cold()
+        )
+
+        cold_minimum_temp = min(
+            stream.input_temperature() for stream in streams if stream.is_cold()
+        )
+
+        maximum_minimum_approch_temp_diff = min(
+            hot_maximum_temp - cold_maximum_temp,
+            hot_minimum_temp - cold_minimum_temp
         )
 
         if minimum_approach_temp_diff < 0:
@@ -52,11 +62,10 @@ class PinchAnalyzer:
                 f"最小接近温度差: {minimum_approach_temp_diff}"
             )
 
-        if minimum_temp + minimum_approach_temp_diff > maximum_temp:
+        if minimum_approach_temp_diff > maximum_minimum_approch_temp_diff:
             raise ValueError(
                 "最小接近温度差が不正です。"
-                f"受熱流体最小温度: {minimum_temp} "
-                f"与熱流体最大温度: {maximum_temp} "
+                f"最大最小接近温度差: {maximum_minimum_approch_temp_diff} "
                 f"最小接近温度差: {minimum_approach_temp_diff}"
             )
 
