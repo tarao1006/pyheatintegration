@@ -1,6 +1,7 @@
 # pyheatintegration
 
 [![Test](https://github.com/tarao1006/pyheatintegration/actions/workflows/test.yml/badge.svg)](https://github.com/tarao1006/pyheatintegration/actions/workflows/test.yml)
+[![PyPI version](https://badge.fury.io/py/pyheatintegration.svg)](https://badge.fury.io/py/pyheatintegration)
 
 ヒートインテグレーションを支援します。グランドコンポジットカーブ、TQ線図の作成に対応しています。
 
