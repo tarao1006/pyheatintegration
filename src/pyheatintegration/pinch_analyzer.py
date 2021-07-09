@@ -3,7 +3,7 @@ from copy import deepcopy
 from .grand_composite_curve import GrandCompositeCurve
 from .line import Line
 from .stream import Stream
-from .tq_diagram import TQDiagram, get_possible_minimum_temp_diff
+from .tq_diagram import TQDiagram, get_possible_minimum_temp_diff_range
 
 
 class PinchAnalyzer:
@@ -35,45 +35,14 @@ class PinchAnalyzer:
 
         streams = deepcopy(streams)
 
-        hot_maximum_temp = max(
-            stream.input_temperature() for stream in streams if stream.is_hot()
-        )
+        minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(streams)
 
-        hot_minimum_temp = min(
-            stream.output_temperature() for stream in streams if stream.is_hot()
-        )
-
-        cold_maximum_temp = max(
-            stream.output_temperature() for stream in streams if stream.is_cold()
-        )
-
-        cold_minimum_temp = min(
-            stream.input_temperature() for stream in streams if stream.is_cold()
-        )
-
-        maximum_minimum_approch_temp_diff = min(
-            hot_maximum_temp - cold_maximum_temp,
-            hot_minimum_temp - cold_minimum_temp
-        )
-
-        if minimum_approach_temp_diff < 0:
-            raise ValueError(
-                f"最小接近温度差に負の値は設定できません。"
-                f"最小接近温度差: {minimum_approach_temp_diff}"
-            )
-
-        if minimum_approach_temp_diff > maximum_minimum_approch_temp_diff:
+        if minimum_approach_temp_diff not in minimum_approach_temp_diff_range:
             raise ValueError(
                 "最小接近温度差が不正です。"
-                f"最大最小接近温度差: {maximum_minimum_approch_temp_diff} "
-                f"最小接近温度差: {minimum_approach_temp_diff}"
-            )
-
-        if (minimum_temp_diff := get_possible_minimum_temp_diff(streams)) > minimum_approach_temp_diff:
-            raise ValueError(
-                "最小接近温度差が不正です。"
-                f"可能最小接近温度差: {minimum_temp_diff} "
-                f"最小接近温度差: {minimum_approach_temp_diff}"
+                f"指定最小接近温度差 [℃]: {minimum_approach_temp_diff}, "
+                f"設定可能最小接近温度差 [℃]: {minimum_approach_temp_diff_range.start:.3f}"
+                f" - {minimum_approach_temp_diff_range.finish:.3f}"
             )
 
         self.gcc = GrandCompositeCurve(streams, minimum_approach_temp_diff)
