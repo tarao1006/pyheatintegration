@@ -26,7 +26,7 @@
 
 <details>
   <summary>TQ線図(結合可能な熱交換器を結合。)</summary>
-  <img src="./docs/images/tq_diagram_merged.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_merged.png" width="400">
 </details>
 
 ## Requirements
