@@ -6,22 +6,22 @@
 
 <details>
   <summary>グランドコンポジットカーブ</summary>
-  <img src="./docs/images/grand_composite_curve.png" width="400">
+  <img src="https://github.com/tarao1006/pyheatintegration/blob/main/docs/images/grand_composite_curve.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図</summary>
-  <img src="./docs/images/tq_diagram.png" width="400">
+  <img src="https://github.com/tarao1006/pyheatintegration/blob/main/docs/images/tq_diagram.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図(流体ごとに分割)</summary>
-  <img src="./docs/images/tq_diagram_separeted.png" width="400">
+  <img src="https://github.com/tarao1006/pyheatintegration/blob/main/docs/images/tq_diagram_separeted.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図(流体ごとに分割。最小接近温度差を満たす。)</summary>
-  <img src="./docs/images/tq_diagram_splitted.png" width="400">
+  <img src="https://github.com/tarao1006/pyheatintegration/blob/main/docs/images/tq_diagram_splitted.png" width="400">
 </details>
 
 <details>
@@ -41,7 +41,7 @@ pip install pyheatintegration
 
 ## Examples
 
-- [simple example](./examples/simple)
+- [simple example](https://github.com/tarao1006/pyheatintegration/blob/main/examples/simple)
 
 ## Documentation
 
