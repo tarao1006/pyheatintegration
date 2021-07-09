@@ -3,7 +3,8 @@ import unittest
 from src.pyheatintegration.enums import StreamType
 from src.pyheatintegration.plot_segment import PlotSegment
 from src.pyheatintegration.stream import Stream
-from src.pyheatintegration.tq_diagram import _create_composite_curve
+from src.pyheatintegration.tq_diagram import (
+    _create_composite_curve, get_possible_minimum_temp_diff_range)
 
 
 class TestCreateCompositeCurve(unittest.TestCase):
@@ -42,6 +43,18 @@ class TestCreateCompositeCurve(unittest.TestCase):
             PlotSegment(120, 170, 15, 20),
             PlotSegment(170, 220, 20, 30)
         ])
+
+
+class TestGetPossibleMinimumTempDiffRange(unittest.TestCase):
+
+    def test_get_possible_minimum_temp_diff_range(self):
+        temp_range = get_possible_minimum_temp_diff_range([
+            Stream(40.0, 90.0, 150.0, StreamType(1)),
+            Stream(80.0, 110.0, 180.0, StreamType(1)),
+            Stream(125.0, 80.0, 160.0, StreamType(2)),
+            Stream(100.0, 60.0, 160.0, StreamType(2)),
+        ])
+        self.assertEqual(temp_range.finish, 15.0)
 
 
 if __name__ == '__main__':
