@@ -29,10 +29,10 @@ Getting Started
 
    # 熱交換を行う流体を準備
    streams = [
-      Stream(40.0, 90.0, 150.0, 1),
-      Stream(80.0, 110.0, 180.0, 1),
-      Stream(125.0, 80.0, 180.0, 2),
-      Stream(100.0, 60.0, 160.0, 2)
+      Stream(40.0, 90.0, 150.0, StreamType(1)),
+      Stream(80.0, 110.0, 180.0, StreamType(1)),
+      Stream(125.0, 80.0, 180.0, StreamType(2)),
+      Stream(100.0, 60.0, 160.0, StreamType(2))
    ]
    minimum_approach_temperature_difference = 10.0
    analyzer = PinchAnalyzer(streams, minimum_approach_temperature_difference)
