@@ -36,7 +36,7 @@ class Stream:
                 の熱量が0以外の場合、および外部流体以外の流体の熱量が0である場合。
         """
         if id_:
-            self._id = id_
+            self.id_ = id_
         else:
             self.id_ = str(uuid.uuid4())
 
