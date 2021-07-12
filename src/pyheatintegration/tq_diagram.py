@@ -391,6 +391,8 @@ def get_possible_minimum_temp_diff_range(
             hot_finish_temp - cold_finish_temp
         )
 
+    minimum_minimum_approch_temp_diff = max(0, minimum_minimum_approch_temp_diff)
+
     return TemperatureRange(
         maximum_minimum_approch_temp_diff,
         minimum_minimum_approch_temp_diff
