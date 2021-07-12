@@ -1,6 +1,7 @@
 import math
+from collections.abc import Callable
 from copy import copy, deepcopy
-from typing import Callable, Optional
+from typing import Optional
 
 from .heat_exchanger import HeatExchanger
 from .heat_range import (REL_TOL_DIGIT, HeatRange, get_detailed_heat_ranges,
