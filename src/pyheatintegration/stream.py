@@ -1,6 +1,6 @@
 import math
 from collections import defaultdict
-from collections.abc import Iterable, Callable
+from collections.abc import Iterable
 from copy import copy
 import uuid
 from .enums import StreamType
@@ -110,7 +110,7 @@ class Stream:
             f"heat flow [W]: {self.heat_flow.__format__(format_spec)}"
         )
 
-    def sort_key(self) -> Callable[[], float]:
+    def sort_key(self) -> float:
         """ソートの際に用いるキーを返します。
         """
         if self.is_hot():

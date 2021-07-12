@@ -62,7 +62,7 @@ class GrandCompositeCurve:
         self.hot_utility_target = self.heats[-1]
         self.cold_utility_target = self.heats[0]
 
-    def solve_external_heat(self) -> dict[int, float]:
+    def solve_external_heat(self) -> dict[str, float]:
         """外部流体による熱交換量を求めます.
 
         Returns:
