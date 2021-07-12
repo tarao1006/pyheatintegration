@@ -17,6 +17,12 @@ class PinchAnalyzer:
     ):
         streams = deepcopy(streams_)
 
+        id_set: set[str] = set()
+        for stream in streams:
+            if stream.id_ in id_set:
+                raise ValueError('流体のidは一意である必要があります。')
+            id_set.add(stream.id_)
+
         hot_streams = sorted(
             [stream for stream in streams if stream.is_hot()],
             key=lambda s: s.output_temperature()
