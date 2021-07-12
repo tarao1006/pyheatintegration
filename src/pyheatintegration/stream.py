@@ -1,8 +1,9 @@
 import math
-from collections import defaultdict
-from collections.abc import Iterable, Callable
-from copy import copy
 import uuid
+from collections import defaultdict
+from collections.abc import Iterable
+from copy import copy
+
 from .enums import StreamType
 from .errors import InvalidStreamError
 from .temperature_range import (TemperatureRange, get_temperature_ranges,
@@ -110,7 +111,7 @@ class Stream:
             f"heat flow [W]: {self.heat_flow.__format__(format_spec)}"
         )
 
-    def sort_key(self) -> Callable[[], float]:
+    def sort_key(self) -> float:
         """ソートの際に用いるキーを返します。
         """
         if self.is_hot():
