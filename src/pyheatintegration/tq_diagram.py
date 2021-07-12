@@ -287,12 +287,14 @@ def _merge_segments(
 
 
 def get_possible_minimum_temp_diff_range(
-    streams: list[Stream]
+    streams: list[Stream],
+    ignore_maximum: bool = False
 ) -> TemperatureRange:
     """設定可能な最小接近温度差を返します。
 
     Args:
         streams (list[Stream]): 流体のリスト。
+        ignore_maximum (bool): 最大値のチェックを無視するか。
 
     Returns:
         float: 可能な最小接近温度差[℃]。
@@ -311,26 +313,43 @@ def get_possible_minimum_temp_diff_range(
     if not cold_streams:
         raise RuntimeError('受熱流体は少なくとも1つは指定する必要があります。')
 
-    hot_maximum_temp = max(
-        stream.input_temperature() for stream in streams if stream.is_hot()
-    )
+    if ignore_maximum:
+        maximum_minimum_approch_temp_diff = math.inf
+    else:
+        hot_maximum_temp = max(
+            stream.input_temperature() for stream in streams if stream.is_hot()
+        )
 
-    hot_minimum_temp = min(
-        stream.output_temperature() for stream in streams if stream.is_hot()
-    )
+        hot_minimum_temp = min(
+            stream.output_temperature() for stream in streams if stream.is_hot()
+        )
 
-    cold_maximum_temp = max(
-        stream.output_temperature() for stream in streams if stream.is_cold()
-    )
+        cold_maximum_temp = max(
+            stream.output_temperature() for stream in streams if stream.is_cold()
+        )
 
-    cold_minimum_temp = min(
-        stream.input_temperature() for stream in streams if stream.is_cold()
-    )
+        cold_minimum_temp = min(
+            stream.input_temperature() for stream in streams if stream.is_cold()
+        )
 
-    maximum_minimum_approch_temp_diff = min(
-        hot_maximum_temp - cold_maximum_temp,
-        hot_minimum_temp - cold_minimum_temp
-    )
+        if hot_minimum_temp - cold_minimum_temp < 0:
+            raise ValueError(
+                '与熱流体の最低温度が受熱流体の最低温度を下回っています。'
+                f'与熱流体最低温度: {hot_minimum_temp:.3f} ℃ '
+                f'受熱流体最低温度: {cold_minimum_temp:.3f} ℃'
+            )
+
+        if hot_maximum_temp - cold_maximum_temp < 0:
+            raise ValueError(
+                '与熱流体の最高温度が受熱流体の最高温度を下回っています。'
+                f'与熱流体最高温度: {hot_maximum_temp:.3f} ℃ '
+                f'受熱流体最高温度: {cold_maximum_temp:.3f} ℃'
+            )
+
+        maximum_minimum_approch_temp_diff = min(
+            hot_maximum_temp - cold_maximum_temp,
+            hot_minimum_temp - cold_minimum_temp
+        )
 
     # 与熱流体と受熱流体のセグメントを得る。
     initial_hcc = _create_composite_curve(hot_streams)
@@ -390,6 +409,8 @@ def get_possible_minimum_temp_diff_range(
             hot_start_temp - cold_start_temp,
             hot_finish_temp - cold_finish_temp
         )
+
+    minimum_minimum_approch_temp_diff = max(0, minimum_minimum_approch_temp_diff)
 
     return TemperatureRange(
         maximum_minimum_approch_temp_diff,
