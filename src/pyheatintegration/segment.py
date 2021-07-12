@@ -114,9 +114,10 @@ class Segment:
 
     def init_plot_segments_separated_streams(
         self,
-        streams: list[Stream],
+        streams_: list[Stream],
         temperature_range: TemperatureRange
     ) -> list[PlotSegment]:
+        streams = sorted(streams_, key=lambda stream: stream.sort_key())
         res: list[PlotSegment] = []
         start_heat = self.heat_range.start
         for i in range(len(streams)):
