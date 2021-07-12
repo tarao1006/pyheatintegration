@@ -29,10 +29,10 @@ Getting Started
 
    # 熱交換を行う流体を準備
    streams = [
-      Stream(40.0, 90.0, 150.0, StreamType(1)),
-      Stream(80.0, 110.0, 180.0, StreamType(1)),
-      Stream(125.0, 80.0, 180.0, StreamType(2)),
-      Stream(100.0, 60.0, 160.0, StreamType(2))
+      Stream(40.0, 90.0, 150.0, StreamType(1), 'cool1'),
+      Stream(80.0, 110.0, 180.0, StreamType(1), 'cool2'),
+      Stream(125.0, 80.0, 180.0, StreamType(2), 'hot1'),
+      Stream(100.0, 60.0, 160.0, StreamType(2), 'hot2')
    ]
    minimum_approach_temperature_difference = 10.0
    analyzer = PinchAnalyzer(streams, minimum_approach_temperature_difference)
@@ -132,15 +132,15 @@ Details
 .. code-block:: python
 
    streams = [
-      Stream(40.0, 90.0, 150.0, StreamType(1)),
-      Stream(80.0, 110.0, 180.0, StreamType(1)),
-      Stream(125.0, 80.0, 180.0, StreamType(2)),
-      Stream(100.0, 60.0, 160.0, StreamType(2))
+      Stream(40.0, 90.0, 150.0, StreamType(1), 'cool1'),
+      Stream(80.0, 110.0, 180.0, StreamType(1), 'cool2'),
+      Stream(125.0, 80.0, 180.0, StreamType(2), 'hot1'),
+      Stream(100.0, 60.0, 160.0, StreamType(2), 'hot2')
    ]
 
 ``Stream`` のコンストラクタ:
 
-.. py:class:: Stream(input_temperature: float, output_temperature: float, heat_flow: float, type_: StreamType, cost: float = 0.0)
+.. py:class:: Stream(input_temperature: float, output_temperature: float, heat_flow: float, type_: StreamType, cost: float = 0.0, id_: str = '')
 
 .. code-block:: python
 
