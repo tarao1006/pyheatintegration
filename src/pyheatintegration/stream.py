@@ -110,19 +110,6 @@ class Stream:
             f"heat flow [W]: {self.heat_flow.__format__(format_spec)}"
         )
 
-    def set_id(self, id_: int) -> None:
-        """流体にidを設定する。
-
-        Args:
-            id_ (int): 設定するid。
-
-        Raises:
-            ValueError: idが0以下であった場合。
-        """
-        if id_ <= 0:
-            raise ValueError('idは0より大きい必要があります。')
-        self.id_ = id_
-
     def is_external(self) -> bool:
         """外部流体であるかを返します。
         """
