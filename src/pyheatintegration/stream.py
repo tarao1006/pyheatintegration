@@ -1,8 +1,8 @@
 import math
 from collections import defaultdict
-from collections.abc import Iterable, Callable
+from collections.abc import Iterable
 from copy import copy
-import uuid
+
 from .enums import StreamType
 from .errors import InvalidStreamError
 from .temperature_range import (TemperatureRange, get_temperature_ranges,
@@ -17,8 +17,7 @@ class Stream:
         output_temperature: float,
         heat_flow: float,
         type_: StreamType,
-        cost: float = 0.0,
-        id_: str = ''
+        cost: float = 0.0
     ):
         """流体を表すクラス。
 
@@ -28,18 +27,13 @@ class Stream:
             heat_flow (float): 熱量
             type_ (StreamType): 流体種
             cost (float, optional): 流体のコスト。外部流体の場合のみ設定できる。
-            id_ (str): 流体を区別する識別子。
 
         Raises:
             InvalidStreamError:
                 入り口温度と出口温度の大小関係と流体種の関係が不正である場合。また、外部流体
                 の熱量が0以外の場合、および外部流体以外の流体の熱量が0である場合。
         """
-        if id_:
-            self.id_ = id_
-        else:
-            self.id_ = str(uuid.uuid4())
-
+        self.id_ = 0
         self.type_ = type_
 
         if self.is_internal() and heat_flow == 0:
@@ -110,12 +104,18 @@ class Stream:
             f"heat flow [W]: {self.heat_flow.__format__(format_spec)}"
         )
 
-    def sort_key(self) -> Callable[[], float]:
-        """ソートの際に用いるキーを返します。
+    def set_id(self, id_: int) -> None:
+        """流体にidを設定する。
+
+        Args:
+            id_ (int): 設定するid。
+
+        Raises:
+            ValueError: idが0以下であった場合。
         """
-        if self.is_hot():
-            return self.output_temperature()
-        return self.input_temperature()
+        if id_ <= 0:
+            raise ValueError('idは0より大きい必要があります。')
+        self.id_ = id_
 
     def is_external(self) -> bool:
         """外部流体であるかを返します。
