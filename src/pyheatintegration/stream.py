@@ -1,8 +1,9 @@
 import math
+import uuid
 from collections import defaultdict
 from collections.abc import Iterable
 from copy import copy
-import uuid
+
 from .enums import StreamType
 from .errors import InvalidStreamError
 from .temperature_range import (TemperatureRange, get_temperature_ranges,
