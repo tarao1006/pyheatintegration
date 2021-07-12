@@ -25,11 +25,11 @@ class PinchAnalyzer:
 
         hot_streams = sorted(
             [stream for stream in streams if stream.is_hot()],
-            key=lambda s: s.output_temperature()
+            key=lambda s: s.sort_key()
         )
         cold_streams = sorted(
             [stream for stream in streams if stream.is_cold()],
-            key=lambda s: s.input_temperature()
+            key=lambda s: s.sort_key()
         )
 
         if not hot_streams:
