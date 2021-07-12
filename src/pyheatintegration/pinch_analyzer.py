@@ -13,7 +13,8 @@ class PinchAnalyzer:
     def __init__(
         self,
         streams_: list[Stream],
-        minimum_approach_temp_diff: float
+        minimum_approach_temp_diff: float,
+        ignore_maximum: bool = False
     ):
         streams = deepcopy(streams_)
 
@@ -37,7 +38,10 @@ class PinchAnalyzer:
         if not cold_streams:
             raise RuntimeError('受熱流体は少なくとも1つは指定する必要があります。')
 
-        minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(streams)
+        minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(
+            streams,
+            ignore_maximum
+        )
 
         if minimum_approach_temp_diff not in minimum_approach_temp_diff_range:
             raise ValueError(
