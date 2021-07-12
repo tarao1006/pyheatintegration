@@ -14,8 +14,7 @@ def main():
             row.output_temperature,
             row.heat_flow,
             StreamType(row.type),
-            row.cost,
-            row.id
+            row.cost
         ) for _, row in df.iterrows()]
 
     minimum_approach_temperature_difference = 10.0
