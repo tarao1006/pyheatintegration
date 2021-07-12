@@ -1,6 +1,6 @@
 import math
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Callable
 from copy import copy
 import uuid
 from .enums import StreamType
@@ -109,6 +109,13 @@ class Stream:
             f"output [℃]: {self.output_temperature().__format__(format_spec)}, "
             f"heat flow [W]: {self.heat_flow.__format__(format_spec)}"
         )
+
+    def sort_key(self) -> Callable[[], float]:
+        """ソートの際に用いるキーを返します。
+        """
+        if self.is_hot():
+            return self.output_temperature()
+        return self.input_temperature()
 
     def is_external(self) -> bool:
         """外部流体であるかを返します。
