@@ -67,14 +67,8 @@ class PinchAnalyzer:
                 raise ValueError('流体のidは一意である必要があります。')
             id_set.add(stream.id_)
 
-        hot_streams = sorted(
-            [stream for stream in streams_ if stream.is_hot()],
-            key=lambda s: s.output_temperature()
-        )
-        cold_streams = sorted(
-            [stream for stream in streams_ if stream.is_cold()],
-            key=lambda s: s.input_temperature()
-        )
+        hot_streams = [stream for stream in streams if stream.is_hot()]
+        cold_streams = [stream for stream in streams if stream.is_cold()]
 
         if not hot_streams:
             raise RuntimeError('与熱流体は少なくとも1つは指定する必要があります。')
