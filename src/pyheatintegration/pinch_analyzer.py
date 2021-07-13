@@ -59,21 +59,13 @@ class PinchAnalyzer:
         minimum_approach_temp_diff: float,
         ignore_maximum: bool = False
     ):
-        streams = deepcopy(streams_)
-
-        id_set: set[str] = set()
-        for stream in streams:
-            if stream.id_ in id_set:
-                raise ValueError('流体のidは一意である必要があります。')
-            id_set.add(stream.id_)
-
         hot_streams = sorted(
-            [stream for stream in streams if stream.is_hot()],
-            key=lambda s: s.sort_key()
+            [stream for stream in streams_ if stream.is_hot()],
+            key=lambda s: s.output_temperature()
         )
         cold_streams = sorted(
-            [stream for stream in streams if stream.is_cold()],
-            key=lambda s: s.sort_key()
+            [stream for stream in streams_ if stream.is_cold()],
+            key=lambda s: s.input_temperature()
         )
 
         if not hot_streams:
@@ -81,10 +73,20 @@ class PinchAnalyzer:
         if not cold_streams:
             raise RuntimeError('受熱流体は少なくとも1つは指定する必要があります。')
 
+<<<<<<< HEAD
         minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(
             streams,
             ignore_maximum
         )
+=======
+        streams = hot_streams + cold_streams
+        for i, s in enumerate(streams):
+            s.set_id(i + 1)
+
+        streams = deepcopy(streams)
+
+        minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(streams)
+>>>>>>> main
 
         if minimum_approach_temp_diff not in minimum_approach_temp_diff_range:
             raise ValueError(

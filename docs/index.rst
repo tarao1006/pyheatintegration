@@ -140,7 +140,7 @@ Details
 
 ``Stream`` のコンストラクタ:
 
-.. py:class:: Stream(input_temperature: float, output_temperature: float, heat_flow: float, type_: StreamType, cost: float = 0.0, id_: str = '')
+.. py:class:: Stream(input_temperature: float, output_temperature: float, heat_flow: float, type_: StreamType, cost: float = 0.0)
 
 .. code-block:: python
 
