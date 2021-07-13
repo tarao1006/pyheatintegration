@@ -11,6 +11,43 @@ from .temperature_range import (TemperatureRange, get_temperature_ranges,
 
 
 class Stream:
+    r"""熱交換を行う流体を表すクラス。
+
+    Args:
+        input_temperature (float): 入り口温度 [℃]。
+        output_temperature (float): 出口温度 [℃]。
+        heat_flow (float): 熱量 [W]。
+        type\_ (StreamType): 流体の種類。
+        state (StreamState): 流体の状態。
+        cost (float): 流体のコスト [円/J]。外部流体の場合のみ設定可能。
+        reboiler_or_reactor (bool): 流体がリボイラーまたは反応器で用いられるかどうか。
+        id\_ (str): 流体を区別する識別子。
+
+    Attributes:
+        id_ (str): 流体を区別する識別子。
+        temperature_range　(TemperatureRange): 温度範囲。
+        heat_flow (float): 熱量 [W]。
+        cost (float): コスト [円/J]。
+        type_ (StreamType): 流体の種類。
+        state　(StreamState): 流体の状態。
+        reboiler_or_reactor (bool): 流体がリボイラーまたは反応器で用いられるかどうか。
+
+    Raises:
+        InvalidStreamError:
+            入り口温度と出口温度の大小関係と流体種の関係が不正である場合。また、外部流体の熱
+            量が0以外の場合および外部流体以外の流体の熱量が0である場合。外部流体以外にコスト
+            を設定した場合。
+
+    Examples:
+        >>> Stream(0, 20, 300)
+        Stream(0, 20, 300, type_=StreamType.COLD, state=StreamState.UNKNOWN, cost=0.0, reboiler_or_reactor=False, id_="e0c1facb-538b-417f-862c-5cf8043ec075")
+        >>> Stream(20, 0, 300)
+        Stream(20, 0, 300, type_=StreamType.HOT, state=StreamState.UNKNOWN, cost=0.0, reboiler_or_reactor=False, id_="1a193fc7-9f34-4e6a-8e99-615d40be1b20")
+        >>> Stream(0, 0, 0)
+        Traceback (most recent call last):
+        ...
+        InvalidStreamError: 入り口温度と出口温度が同じ流体の種類は明示的に指定する必要があります。
+    """
 
     def __init__(
         self,
@@ -23,22 +60,6 @@ class Stream:
         reboiler_or_reactor: bool = False,
         id_: str = ''
     ):
-        """流体を表すクラス。
-
-        Args:
-            input_temperature (float): 入口温度。
-            output_temperature (float): 出口温度。
-            heat_flow (float): 熱量。
-            type_ (StreamType): 流体種。
-            cost (float, optional): 流体のコスト。外部流体の場合のみ設定できる。
-            reboiler_or_reactor (bool): 流体がリボイラーまたは反応器で用いられるか。
-            id_ (str): 流体を区別する識別子。
-
-        Raises:
-            InvalidStreamError:
-                入口温度と出口温度の大小関係と流体種の関係が不正である場合。また、外部流体の
-                熱量が0以外の場合、および外部流体以外の流体の熱量が0である場合。
-        """
         if id_:
             self.id_ = id_
         else:
@@ -72,23 +93,23 @@ class Stream:
             raise InvalidStreamError(
                 "受熱流体は入り口温度が出口温度より低い必要があります。"
                 f"流体の種類: {self.type_.describe()} "
-                f"入り口温度: {input_temperature} "
-                f"出口温度: {output_temperature}"
+                f"入り口温度 [℃]: {input_temperature} "
+                f"出口温度 [℃]: {output_temperature}"
             )
 
         if self.is_hot() and input_temperature < output_temperature:
             raise InvalidStreamError(
                 "与熱流体は入り口温度が出口温度より高い必要があります。"
                 f"流体の種類: {self.type_.describe()} "
-                f"入り口温度: {input_temperature} "
-                f"出口温度: {output_temperature}"
+                f"入り口温度 [℃]: {input_temperature} "
+                f"出口温度 [℃]: {output_temperature}"
             )
 
         if self.is_internal() and cost != 0:
             raise InvalidStreamError(
                 "外部流体以外にはコストを設定できません。"
                 f"流体の種類: {self.type_.describe()} "
-                f"コスト: {cost} "
+                f"コスト [円]: {cost} "
             )
 
         self.cost = cost
@@ -113,32 +134,42 @@ class Stream:
 
     def __repr__(self) -> str:
         return (
-            f"Stream({self.input_temperature()}, "
-            f"{self.output_temperature()}, "
-            f"{self.heat_flow}, "
-            f"{self.type_}, "
-            f"{self.cost})"
+            f'Stream('
+            f'{self.input_temperature()}, '
+            f'{self.output_temperature()}, '
+            f'{self.heat_flow}, '
+            f'type_={self.type_}, '
+            f'state={self.state}, '
+            f'cost={self.cost}, '
+            f'reboiler_or_reactor={self.reboiler_or_reactor}, '
+            f'id_="{self.id_}"'
+            ')'
         )
 
     def __str__(self) -> str:
         return (
-            f"{self.type_.describe()}, "
-            f"input [℃]: {self.input_temperature()}, "
-            f"output [℃]: {self.output_temperature()}, "
-            f"heat flow [W]: {self.heat_flow}"
+            f'{self.type_.describe()}, '
+            f'input [℃]: {self.input_temperature()}, '
+            f'output [℃]: {self.output_temperature()}, '
+            f'heat flow [W]: {self.heat_flow}'
         )
 
     def __format__(self, format_spec: str) -> str:
         description = self.type_.describe()
         return (
-            f"{description},{'':{14 - len(description)}s}"
-            f"input [℃]: {self.input_temperature().__format__(format_spec)}, "
-            f"output [℃]: {self.output_temperature().__format__(format_spec)}, "
-            f"heat flow [W]: {self.heat_flow.__format__(format_spec)}"
+            f'{description},{"":{14 - len(description)}s}'
+            f'input [℃]: {self.input_temperature().__format__(format_spec)}, '
+            f'output [℃]: {self.output_temperature().__format__(format_spec)}, '
+            f'heat flow [W]: {self.heat_flow.__format__(format_spec)}'
         )
 
     def sort_key(self) -> float:
         """ソートの際に用いるキーを返します。
+
+        与熱流体は出口温度、受熱温度は入口温度を返します。
+
+        Returns:
+            float: ソート時にキーとなる値。
         """
         if self.is_hot():
             return self.output_temperature()
@@ -146,31 +177,49 @@ class Stream:
 
     def is_external(self) -> bool:
         """外部流体であるかを返します。
+
+        Returns:
+            bool: 外部流体であるかどうか。
         """
         return self.type_ in [StreamType.EXTERNAL_HOT, StreamType.EXTERNAL_COLD]
 
     def is_internal(self) -> bool:
         """外部流体以外であるかを返します。
+
+        Returns:
+            bool: 外部流体以外であるかどうか。
         """
         return not self.is_external()
 
     def is_hot(self) -> bool:
         """与熱流体であるかを返します。
+
+        Returns:
+            bool: 与熱流体であるかどうか。
         """
         return self.type_ in [StreamType.HOT, StreamType.EXTERNAL_HOT]
 
     def is_cold(self) -> bool:
         """受熱流体であるかを返します。
+
+        Returns:
+            bool: 受熱流体であるかどうか。
         """
         return not self.is_hot()
 
     def is_isothermal(self) -> bool:
-        """温度変化がない流体かを返します。
+        """等温流体かを返します。
+
+        Returns:
+            bool: 等温流体であるかどうか。
         """
         return math.isclose(self.temperature_range.delta, 0.0)
 
     def input_temperature(self) -> float:
         """入り口温度を返します。
+
+        Returns:
+            float: 入り口温度。
         """
         if self.is_hot():
             return self.temperature_range.finish
@@ -178,6 +227,9 @@ class Stream:
 
     def output_temperature(self) -> float:
         """出口温度を返します。
+
+        Returns:
+            float: 出口温度。
         """
         if self.is_hot():
             return self.temperature_range.start
@@ -185,16 +237,25 @@ class Stream:
 
     def temperature(self) -> float:
         """温度変化を返します。
+
+        Returns:
+            float: 温度変化 [℃]。
         """
         return self.temperature_range.delta
 
     def heat(self) -> float:
         """熱量を返します。
+
+        Returns:
+            float: 熱量 [W]。
         """
         return self.heat_flow
 
     def temperatures(self) -> tuple[float, float]:
         """入り口温度と出口温度を返します。
+
+        Returns:
+            tuple[float, float]: 温度範囲。
         """
         return self.temperature_range()
 
@@ -211,6 +272,9 @@ class Stream:
 
         Args:
             temperature (float): 検証したい温度。
+
+        Returns:
+            bool: 与えられた温度をとるかどうか。
         """
         return temperature in self.temperature_range
 
@@ -221,6 +285,9 @@ class Stream:
 
         Args:
             temperatures (list[float]): 検証したい温度のリスト。
+
+        Returns:
+            bool: 与えられた複数の温度をとるかどうか。
         """
         return all(map(lambda t: t in self.temperature_range, temperatures))
 
@@ -235,8 +302,8 @@ class Stream:
         度変化の比に従って更新します。
 
         Args:
-            input_temperature (float): 更新する入り口温度。
-            output_temperature (float): 更新する出口温度。
+            input_temperature (float): 更新する入り口温度 [℃]。
+            output_temperature (float): 更新する出口温度 [℃]。
 
         Raises:
             ValueError: 等温流体に対して温度を更新しようとした場合。
