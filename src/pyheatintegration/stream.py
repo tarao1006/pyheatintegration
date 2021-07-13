@@ -17,7 +17,7 @@ class Stream:
         input_temperature: float,
         output_temperature: float,
         heat_flow: float,
-        type_: StreamType,
+        type_: StreamType = StreamType.AUTO,
         state: StreamState = StreamState.UNKNOWN,
         cost: float = 0.0,
         reboiler_or_reactor: bool = False,
@@ -44,7 +44,17 @@ class Stream:
         else:
             self.id_ = str(uuid.uuid4())
 
-        self.type_ = type_
+        if type_ == StreamType.AUTO:
+            if input_temperature < output_temperature:
+                self.type_ = StreamType.COLD
+            elif input_temperature > output_temperature:
+                self.type_ = StreamType.HOT
+            else:
+                raise InvalidStreamError(
+                    '入り口温度と出口温度が同じ流体の種類は明示的に指定する必要があります。'
+                )
+        else:
+            self.type_ = type_
 
         if self.is_internal() and heat_flow == 0:
             raise InvalidStreamError(

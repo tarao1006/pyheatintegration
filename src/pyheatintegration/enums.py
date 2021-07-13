@@ -8,6 +8,7 @@ class StreamType(Enum):
     HOT = 2
     EXTERNAL_COLD = 3
     EXTERNAL_HOT = 4
+    AUTO = 5
 
     def describe(self) -> str:
         return STREAMTYPE_STR[self.name]
@@ -18,6 +19,7 @@ STREAMTYPE_STR: dict[str, str] = {
     'HOT': 'hot',
     'EXTERNAL_COLD': 'external cold',
     'EXTERNAL_HOT': 'external hot',
+    'AUTO': 'auto'
 }
 
 
