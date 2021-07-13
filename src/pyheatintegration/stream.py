@@ -333,6 +333,38 @@ class Stream:
         self.heat_flow = heat_flow
 
 
+def is_valid_streams(streams: list[Stream]) -> bool:
+    """与熱流体および受熱流体がそれぞれ1つ以上含まれるかどうかを返します。
+
+    Args:
+        streams (list[Stream]): 流体のリスト。
+
+    Returns:
+        bool: 流体のリストが不正かどうか。
+
+    Example:
+        >>> is_valid_streams([
+                Stream(40, 90, 150),
+                Stream(80, 110, 180),
+                Stream(125, 80, 160),
+                Stream(100, 60, 160)
+            ])
+        True
+        >>> is_valid_streams([
+                Stream(40, 90, 150),
+                Stream(80, 110, 180)
+            ])
+        False
+    """
+
+    hot_streams = [stream for stream in streams if stream.is_hot()]
+    cold_streams = [stream for stream in streams if stream.is_cold()]
+
+    if not hot_streams or not cold_streams:
+        return False
+    return True
+
+
 def get_temperature_range_streams(
     streams: list[Stream]
 ) -> tuple[
