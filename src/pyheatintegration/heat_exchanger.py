@@ -5,7 +5,6 @@ from .enums import StreamState
 from .heat_range import HeatRange
 from .plot_segment import PlotSegment
 
-
 OVERALL_HEAT_TRANSFER_COEFFICIENT = {
     StreamState.LIQUID: {
         StreamState.LIQUID: 300.0,

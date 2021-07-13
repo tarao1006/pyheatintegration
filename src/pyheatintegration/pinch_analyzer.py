@@ -1,12 +1,12 @@
 from copy import deepcopy
 
 from .grand_composite_curve import GrandCompositeCurve
+from .heat_exchanger import HeatExchanger
 from .heat_range import HeatRange, get_detailed_heat_ranges
 from .line import Line
+from .plot_segment import PlotSegment, get_plot_segments
 from .stream import Stream
 from .tq_diagram import TQDiagram, get_possible_minimum_temp_diff_range
-from .plot_segment import PlotSegment, get_plot_segments
-from .heat_exchanger import HeatExchanger
 
 
 class PinchAnalyzer:
