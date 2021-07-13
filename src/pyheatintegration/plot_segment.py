@@ -4,6 +4,7 @@ import uuid
 from collections.abc import Iterable
 from typing import Optional
 
+from .enums import StreamState
 from .heat_range import HeatRange
 from .heat_range import is_continuous as is_continuous_heat_ranges
 from .temperature_range import TemperatureRange
@@ -20,7 +21,8 @@ class PlotSegment:
         finish_heat: float = 0.0,
         start_temperature: float = 0.0,
         finish_temperature: float = 0.0,
-        uuid_: Optional[str] = None
+        uuid_: Optional[str] = None,
+        state: StreamState = StreamState.UNKNOWN
     ):
         self.heat_range = HeatRange(start_heat, finish_heat)
         self.temperature_range = TemperatureRange(start_temperature, finish_temperature)
@@ -28,6 +30,8 @@ class PlotSegment:
             self.uuid = str(uuid.uuid4())
         else:
             self.uuid = uuid_
+
+        self.state = state
 
     def __str__(self) -> str:
         return (
@@ -194,7 +198,8 @@ def get_plot_segments(
                     PlotSegment(
                         *heat_range(),
                         *plot_segment.temperatures_at_heats(heat_range()),
-                        plot_segment.uuid
+                        plot_segment.uuid,
+                        plot_segment.state
                     )
                 )
     return res

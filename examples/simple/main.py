@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.collections import LineCollection
 
-from pyheatintegration import (PinchAnalyzer, Stream, StreamType,
+from pyheatintegration import (PinchAnalyzer, Stream, StreamState, StreamType,
                                extract_x, y_range)
 
 
@@ -14,8 +14,9 @@ def main():
             row.output_temperature,
             row.heat_flow,
             StreamType(row.type),
-            row.cost,
-            row.id
+            StreamState(row.state),
+            cost=row.cost,
+            id_=row.id
         ) for _, row in df.iterrows()]
 
     minimum_approach_temperature_difference = 10.0

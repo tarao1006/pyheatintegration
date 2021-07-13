@@ -4,7 +4,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from copy import copy
 
-from .enums import StreamType
+from .enums import StreamState, StreamType
 from .errors import InvalidStreamError
 from .temperature_range import (TemperatureRange, get_temperature_ranges,
                                 get_temperature_transition)
@@ -18,6 +18,7 @@ class Stream:
         output_temperature: float,
         heat_flow: float,
         type_: StreamType,
+        state: StreamState = StreamState.UNKNOWN,
         cost: float = 0.0,
         id_: str = ''
     ):
@@ -84,6 +85,17 @@ class Stream:
             output_temperature
         )
         self.heat_flow = heat_flow
+
+        self.state = state
+
+        if self.state in [StreamState.LIQUID_EVAPORATION, StreamState.GAS_CONDENSATION] \
+           and not self.is_isothermal():
+            raise InvalidStreamError(
+                '相変化によって熱交換を行う流体は等温である必要があります。'
+                f'流体の状態: {self.state.describe()} '
+                f'入口温度: {input_temperature} '
+                f'出口温度: {output_temperature}'
+            )
 
     def __repr__(self) -> str:
         return (

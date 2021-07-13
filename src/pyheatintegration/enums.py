@@ -19,3 +19,25 @@ STREAMTYPE_STR: dict[str, str] = {
     'EXTERNAL_COLD': 'external cold',
     'EXTERNAL_HOT': 'external hot',
 }
+
+
+class StreamState(Enum):
+    """流体の状態"""
+
+    LIQUID = 1
+    GAS = 2
+    LIQUID_EVAPORATION = 3
+    GAS_CONDENSATION = 4
+    UNKNOWN = 5
+
+    def describe(self) -> str:
+        return STREAMSTATE_STR[self.name]
+
+
+STREAMSTATE_STR = {
+    'LIQUID': 'liquid',
+    'GAS': 'gas',
+    'LIQUID_EVAPORATION': 'liquid (evaporation)',
+    'GAS_CONDENSATION': 'gas (condensation)',
+    'UNKNOWN': 'unknown'
+}
