@@ -95,9 +95,6 @@ class PinchAnalyzer:
                 HeatExchanger(heat_range, hot_plot_segment, cold_plot_segment)
             )
 
-        for heat_exchanger in self.heat_exchangers:
-            print(heat_exchanger.reboiler_or_reactor)
-
         self.heat_exchanger_cost = sum(
             self.calculate_heat_exchanger_cost(
                 heat_exchanger.area_counterflow,
