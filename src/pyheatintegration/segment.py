@@ -132,7 +132,8 @@ class Segment:
                 finish_heat,
                 *temperature_range(),
                 str(streams[i].id_),
-                streams[i].state
+                streams[i].state,
+                streams[i].reboiler_or_reactor
             ))
             start_heat += heat
         return res
@@ -178,13 +179,15 @@ class Segment:
                     *heat_range(),
                     *self.hot_temperature_range(),
                     hot_plot_segment.uuid,
-                    hot_plot_segment.state
+                    hot_plot_segment.state,
+                    hot_plot_segment.reboiler_or_reactor
                 )
                 cold_heat_range_plot_segment[heat_range] = PlotSegment(
                     *heat_range(),
                     *self.cold_temperature_range(),
                     cold_plot_segment.uuid,
-                    cold_plot_segment.state
+                    cold_plot_segment.state,
+                    cold_plot_segment.reboiler_or_reactor
                 )
 
                 for heat_range_ in self.heat_ranges:
@@ -204,7 +207,8 @@ class Segment:
                             *heat_range_(),
                             *self.hot_temperature_range(),
                             hot_plot_segment.uuid,
-                            hot_plot_segment.state
+                            hot_plot_segment.state,
+                            hot_plot_segment.reboiler_or_reactor
                         )
 
                     if cold_plot_segment_ is not None and cold_plot_segment_.uuid == cold_plot_segment.uuid:
@@ -212,7 +216,8 @@ class Segment:
                             *heat_range_(),
                             *self.cold_temperature_range(),
                             cold_plot_segment.uuid,
-                            cold_plot_segment.state
+                            cold_plot_segment.state,
+                            cold_plot_segment.reboiler_or_reactor
                         )
 
         self.hot_plot_segments_splitted = sorted(list(hot_heat_range_plot_segment.values()))

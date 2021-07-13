@@ -22,7 +22,8 @@ class PlotSegment:
         start_temperature: float = 0.0,
         finish_temperature: float = 0.0,
         uuid_: Optional[str] = None,
-        state: StreamState = StreamState.UNKNOWN
+        state: StreamState = StreamState.UNKNOWN,
+        reboiler_or_reactor: bool = False
     ):
         self.heat_range = HeatRange(start_heat, finish_heat)
         self.temperature_range = TemperatureRange(start_temperature, finish_temperature)
@@ -32,6 +33,7 @@ class PlotSegment:
             self.uuid = uuid_
 
         self.state = state
+        self.reboiler_or_reactor = reboiler_or_reactor
 
     def __str__(self) -> str:
         return (
@@ -162,7 +164,9 @@ class PlotSegment:
             other.finish_heat(),
             self.start_temperature(),
             other.finish_temperature(),
-            self.uuid
+            self.uuid,
+            self.state,
+            self.reboiler_or_reactor
         )
 
 
@@ -199,7 +203,8 @@ def get_plot_segments(
                         *heat_range(),
                         *plot_segment.temperatures_at_heats(heat_range()),
                         plot_segment.uuid,
-                        plot_segment.state
+                        plot_segment.state,
+                        plot_segment.reboiler_or_reactor
                     )
                 )
     return res

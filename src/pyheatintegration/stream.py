@@ -20,6 +20,7 @@ class Stream:
         type_: StreamType,
         state: StreamState = StreamState.UNKNOWN,
         cost: float = 0.0,
+        reboiler_or_reactor: bool = False,
         id_: str = ''
     ):
         """流体を表すクラス。
@@ -30,6 +31,7 @@ class Stream:
             heat_flow (float): 熱量。
             type_ (StreamType): 流体種。
             cost (float, optional): 流体のコスト。外部流体の場合のみ設定できる。
+            reboiler_or_reactor (bool): 流体がリボイラーまたは反応器で用いられるか。
             id_ (str): 流体を区別する識別子。
 
         Raises:
@@ -96,6 +98,8 @@ class Stream:
                 f'入口温度: {input_temperature} '
                 f'出口温度: {output_temperature}'
             )
+
+        self.reboiler_or_reactor = reboiler_or_reactor
 
     def __repr__(self) -> str:
         return (
