@@ -56,6 +56,11 @@ def is_continuous(temp_ranges_: list[TemperatureRange]) -> Optional[tuple[float,
 
     Returns:
         Optional[tuple[float, float]]: 領域が連続であるか。
+
+    Examples:
+        >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(10, 20)])
+        >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(20, 40)])
+        (10, 20)
     """
     temp_ranges = sorted(temp_ranges_)
     for i in range(len(temp_ranges)):
