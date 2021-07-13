@@ -72,6 +72,11 @@ def get_overall_heat_transfer_coefficient(
 class HeatExchanger:
     """熱交換器を表すクラス。
 
+    Args:
+        heat_range (HeatRange): 熱量領域。
+        hot_plot_segment (PlotSegment): 与熱流体のプロットセグメント。
+        cold_plot_segment (PlotSegment): 受熱流体のプロットセグメント。
+
     Attributes:
         heat_range (HeatRange): 熱交換の範囲。
         hot_stream_uuid (str): 与熱流体のid。
@@ -123,10 +128,10 @@ class HeatExchanger:
 
     def __repr__(self) -> str:
         return (
-            "HeatExchanger("
-            f"{self.heat_range}, "
-            f"{self.hot_plot_segment}, "
-            f"{self.cold_plot_segment})"
+            'HeatExchanger('
+            f'{self.heat_range}, '
+            f'{self.hot_plot_segment}, '
+            f'{self.cold_plot_segment})'
         )
 
     def __str__(self) -> str:
@@ -141,6 +146,13 @@ class HeatExchanger:
         return self.heat_range < other.heat_range
 
     def init_lmtd_pararell_flow(self) -> Optional[float]:
+        """並流の場合の対数平均温度差を返します。
+
+        並流が不可能な場合はNoneを返します。
+
+        Returns:
+            Optional[float]: 並流の場合の対数平均温度差。並流が不可能な場合はNone。
+        """
         hot_low_temp, hot_high_temp = self.hot_temperature_range()
         cold_low_temp, cold_high_temp = self.cold_temperature_range()
 
@@ -156,6 +168,11 @@ class HeatExchanger:
         return (start_temp_diff - finish_temp_diff) / math.log(start_temp_diff / finish_temp_diff)
 
     def init_lmtd_counterflow(self) -> float:
+        """向流の場合の対数平均温度差を返します。
+
+        Returns:
+            float: 向流の場合の対数平均温度差。
+        """
         hot_low_temp, hot_high_temp = self.hot_temperature_range()
         cold_low_temp, cold_high_temp = self.cold_temperature_range()
 
@@ -169,6 +186,15 @@ class HeatExchanger:
 
 
 def merge_heat_exchangers(heat_exchanger: HeatExchanger, other: HeatExchanger) -> HeatExchanger:
+    """熱交換器を結合します。
+
+    Args:
+        heat_exchanger (HeatExchange): 熱交換器。
+        other (HeatExchanger): 熱交換器(結合対象)。
+
+    Returns:
+        HeatExchanger: 結合後の熱交換器。
+    """
     heat_range = heat_exchanger.heat_range.merge(other.heat_range)
     hot_plot_segment = heat_exchanger.hot_plot_segment.merge(other.hot_plot_segment)
     cold_plot_segment = heat_exchanger.cold_plot_segment.merge(other.cold_plot_segment)
