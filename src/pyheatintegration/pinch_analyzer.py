@@ -31,9 +31,11 @@ def calculate_heat_exchanger_cost(
 
 
 class PinchAnalyzer:
-    """エントリーポイント。
+    """流体のリストと最小接近温度差を設定し、グランドコンポジットカーブおよびTQ線図を作成します。
 
-    解析を行う場合はこのクラス経由で扱う。
+    解析を行う場合はこのクラス経由で扱います。このクラスを経由することで、流体のidが重複してい
+    ないことや、最小接近温度差が指定可能な値であるかを検証したのちに図を作成するため、予想外の
+    エラーが生じることを回避することができます。
 
     Args:
         streams_ (list[Stream]): 流体のリスト。
@@ -42,7 +44,7 @@ class PinchAnalyzer:
 
     Attributes:
         gcc (GrandCompositeCurve): グランドコンポジットカーブ。
-        tq (TQDiagram): TQ線図
+        tq (TQDiagram): TQ線図。
         streams (list[Stream]): 流体のリスト。
         pinch_point_temp (float): ピンチポイントの温度 [℃]。
         heat_exchangers (list[HeatExchanger]): 熱交換器のリスト。
