@@ -8,6 +8,7 @@ from .enums import StreamState
 from .heat_range import HeatRange
 from .heat_range import is_continuous as is_continuous_heat_ranges
 from .temperature_range import TemperatureRange
+from .line import Line
 
 
 class PlotSegment:
@@ -48,7 +49,7 @@ class PlotSegment:
             self.uuid = uuid_
 
         self.state = state
-        self.state = reboiler_or_reactor
+        self.reboiler_or_reactor = reboiler_or_reactor
 
     def __str__(self) -> str:
         return (
@@ -102,43 +103,118 @@ class PlotSegment:
             return NotImplemented
         return self.heat_range >= other.heat_range
 
-    def line(self) -> tuple[tuple[float, float], tuple[float, float]]:
+    def line(self) -> Line:
+        """直線の始点と終点を返します。
+
+        Returns:
+            Line: 直線。
+        """
         return (
             (self.heats()[0], self.temperatures()[0]),
             (self.heats()[1], self.temperatures()[1])
         )
 
     def heats(self) -> tuple[float, float]:
+        """熱量の開始値と終了値を返します。
+
+        Returns:
+            tuple[float, float]: 熱量の開始値と終了値。
+        """
         return self.heat_range()
 
     def start_heat(self) -> float:
+        """熱量の開始値を返します。
+
+        Returns:
+            float: 熱量の開始値。
+        """
         return self.heat_range.start
 
     def finish_heat(self) -> float:
+        """熱量の終了値を返します。
+
+        Returns:
+            float: 熱量の終了値。
+        """
         return self.heat_range.finish
 
     def temperatures(self) -> tuple[float, float]:
+        """温度の開始値と終了値を返します。
+
+        Returns:
+            tuple[float, float]: 温度の開始値と終了値。
+        """
         return self.temperature_range()
 
     def start_temperature(self) -> float:
+        """温度の開始値を返します。
+
+        Returns:
+            float: 温度の開始値。
+        """
         return self.temperature_range.start
 
     def finish_temperature(self) -> float:
+        """温度の終了値を返します。
+
+        Returns:
+            float: 温度の終了値。
+        """
         return self.temperature_range.finish
 
     def contain_heat(self, heat: float) -> bool:
+        """熱量を含むかを返します。
+
+        Args:
+            heat (float): 含むかを検証する熱量。
+
+        Returns:
+            bool: 熱量を含むかどうか。
+        """
         return heat in self.heat_range
 
     def contain_heats(self, heats: Iterable[float]) -> bool:
+        """複数の熱量を含むかを返します。
+
+        Args:
+            heats (Iterable[float]): 含むかを検証する熱量。
+
+        Returns:
+            bool: 複数の熱量を含むかどうか。
+        """
         return all(self.contain_heat(heat) for heat in heats)
 
     def contain_temperature(self, temperature: float) -> bool:
+        """温度を含むかを返します。
+
+        Args:
+            temperature (float): 含むかを検証する温度。
+
+        Returns:
+            bool: 温度を含むかどうか。
+        """
         return temperature in self.temperature_range
 
     def temperatures_at_heats(self, heats: tuple[float, float]) -> tuple[float, float]:
+        """ある複数の熱量をとる温度を返します。
+
+        Args:
+            heats (tuple[float, float]): 温度を求めたい熱量。
+
+        Returns:
+            tuple[float, float]: ある熱量をとる温度。
+        """
         return self.temperature_at_heat(heats[0]), self.temperature_at_heat(heats[1])
 
     def temperature_at_heat(self, heat: float) -> float:
+        """ある熱量をとる温度を返します。
+
+        Args:
+            heat (float): 温度を求めたい熱量。
+
+        Returns:
+            float: ある熱量をとる温度。
+        """
         if not self.contain_heat(heat):
             raise ValueError('heatを含んでいる必要があります。')
 
@@ -149,8 +225,16 @@ class PlotSegment:
         return slope * (heat - heat_left) + temp_left
 
     def heat_at_temperature(self, temperature: float) -> float:
+        """ある温度をとる熱量を返します。
+
+        Args:
+            temperature (float): 熱量を求めたい温度。
+
+        Returns:
+            float: ある温度をとる熱量。
+        """
         if not self.contain_temperature(temperature):
-            raise ValueError('heatを含んでいる必要があります。')
+            raise ValueError('temperatureを含んでいる必要があります。')
 
         heat_left, heat_right = self.heat_range()
         temp_left, temp_right = self.temperature_range()
@@ -159,14 +243,35 @@ class PlotSegment:
         return 1 / slope * (temperature - temp_left) + heat_left
 
     def shift_heat(self, delta: float) -> None:
+        """熱量をずらします。
+
+        Args:
+            delta (float): ずらす値。
+        """
         self.heat_range.shift(delta)
 
-    def mergiable(self, other) -> bool:
+    def mergiable(self, other: PlotSegment) -> bool:
+        """プロットセグメントを結合可能かを返します。
+
+        Args:
+            other (PlotSegment): 結合できるかを検証したいプロットセグメント。
+
+        Returns:
+            bool: 結合可能かどうか。
+        """
         return (self.uuid == other.uuid) \
             and (self.finish_heat() == other.start_heat()) \
             and (self.finish_temperature() == other.start_temperature())
 
     def merge(self, other: PlotSegment) -> PlotSegment:
+        """プロットセグメントを結合します。
+
+        Args:
+            other (PlotSegment): 結合したいプロットセグメント。
+
+        Returns:
+            PlotSegment: 結合後のプロットセグメント。
+        """
         if self.finish_heat() != other.start_heat():
             raise ValueError("other's start_heat must be self's finish_heat.")
         if self.finish_temperature() != other.start_temperature():
