@@ -10,8 +10,45 @@ from .stream import Stream
 from .tq_diagram import TQDiagram, get_possible_minimum_temp_diff_range
 
 
+def calculate_heat_exchanger_cost(
+    area: float,
+    reboiler_or_reactor: bool = False
+) -> float:
+    """熱交換器にかかるコストを返します。
+
+    Args:
+        area (float): 熱交換器の面積。
+        k (float): 係数。リボイラーまたは反応器の場合は2
+
+    Returns:
+        float: コスト[円]。
+    """
+    if reboiler_or_reactor:
+        k = 2.0
+    else:
+        k = 1.0
+    return 1_500_000 * math.pow(area, 0.65) * k
+
+
 class PinchAnalyzer:
     """エントリーポイント。
+
+    解析を行う場合はこのクラス経由で扱う。
+
+    Args:
+        streams_ (list[Stream]): 流体のリスト。
+        minimum_approach_temp_diff (float): 最小接近温度差 [℃]。
+        ignore_maximum (bool): 最小接近温度差の最大値のチェックを無視するかどうか。
+
+    Attributes:
+        gcc (GrandCompositeCurve): グランドコンポジットカーブ。
+        tq (TQDiagram): TQ線図
+        streams (list[Stream]): 流体のリスト。
+        pinch_point_temp (float): ピンチポイントの温度 [℃]。
+        heat_exchangers (list[HeatExchanger]): 熱交換器のリスト。
+        heat_exchanger_cost (float): 熱交換器のコスト。
+
+
     """
 
     def __init__(
@@ -96,7 +133,7 @@ class PinchAnalyzer:
             )
 
         self.heat_exchanger_cost = sum(
-            self.calculate_heat_exchanger_cost(
+            calculate_heat_exchanger_cost(
                 heat_exchanger.area_counterflow,
                 heat_exchanger.reboiler_or_reactor
             )
@@ -109,7 +146,7 @@ class PinchAnalyzer:
         return self.gcc.heats, self.gcc.temps
 
     def create_tq(self) -> tuple[list[Line], list[Line]]:
-        """tq線図をを描くために必要な直線と熱量変化帯を返します。
+        """tq線図をを描くために必要な与熱複合線および受熱複合線を返します。
         """
         return (
             self.tq.hot_lines,
@@ -117,7 +154,7 @@ class PinchAnalyzer:
         )
 
     def create_tq_separated(self) -> tuple[list[Line], list[Line]]:
-        """流体ごとに分割したtq線図をを描くために必要な直線と熱量変化帯を返します。
+        """流体ごとに分割したtq線図をを描くために必要な与熱複合線および受熱複合線を返します。
         """
         return (
             self.tq.hot_lines_separated,
@@ -125,7 +162,7 @@ class PinchAnalyzer:
         )
 
     def create_tq_splitted(self) -> tuple[list[Line], list[Line]]:
-        """流体ごとに分割し、最小接近温度差の条件を満たしたtq線図をを描くために必要な直線を返します。
+        """流体ごとに分割し、最小接近温度差の条件を満たしたtq線図をを描くために必要な与熱複合線および受熱複合線を返します。
         """
         return (
             self.tq.hot_lines_splitted,
@@ -133,29 +170,9 @@ class PinchAnalyzer:
         )
 
     def create_tq_merged(self) -> tuple[list[Line], list[Line]]:
-        """流体ごとに分割し、最小接近温度差の条件を満たしたtq線図をを描くために必要な直線を返します。
+        """結合可能な熱交換器を結合したtq線図をを描くために必要な与熱複合線および受熱複合線を返します。
         """
         return (
             self.tq.hot_lines_merged,
             self.tq.cold_lines_merged
         )
-
-    def calculate_heat_exchanger_cost(
-        self,
-        area: float,
-        reboiler_or_reactor: bool = False
-    ) -> float:
-        """熱交換器にかかるコストを返します。
-
-        Args:
-            area (float): 熱交換器の面積。
-            k (float): 係数。リボイラーまたは反応器の場合は2
-
-        Returns:
-            float: コスト[円]。
-        """
-        if reboiler_or_reactor:
-            k = 2.0
-        else:
-            k = 1.0
-        return 1_500_000 * math.pow(area, 0.65) * k
