@@ -1,7 +1,8 @@
 import unittest
 
 from src.pyheatintegration.enums import StreamState
-from src.pyheatintegration.heat_exchanger import get_overall_heat_transfer_coefficient
+from src.pyheatintegration.heat_exchanger import \
+    get_overall_heat_transfer_coefficient
 
 
 class TestGetOverallHeatTransferCoefficient(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest
 
-from src.pyheatintegration.line import y_range, extract_x
+from src.pyheatintegration.line import extract_x, y_range
 
 
 class TestLine(unittest.TestCase):

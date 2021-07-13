@@ -7,8 +7,8 @@ from typing import Optional
 from .enums import StreamState
 from .heat_range import HeatRange
 from .heat_range import is_continuous as is_continuous_heat_ranges
-from .temperature_range import TemperatureRange
 from .line import Line
+from .temperature_range import TemperatureRange
 
 
 class PlotSegment:

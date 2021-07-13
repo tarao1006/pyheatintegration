@@ -1,5 +1,5 @@
-from copy import deepcopy
 import math
+from copy import deepcopy
 
 from .grand_composite_curve import GrandCompositeCurve
 from .heat_exchanger import HeatExchanger

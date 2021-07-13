@@ -1,7 +1,9 @@
 import unittest
 
-from src.pyheatintegration.heat_range import (HeatRange, get_heat_ranges,
-                                              get_heats, is_continuous, get_detailed_heat_ranges)
+from src.pyheatintegration.heat_range import (HeatRange,
+                                              get_detailed_heat_ranges,
+                                              get_heat_ranges, get_heats,
+                                              is_continuous)
 
 
 class TestHeatRange(unittest.TestCase):
