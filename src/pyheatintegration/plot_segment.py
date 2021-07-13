@@ -11,9 +11,24 @@ from .temperature_range import TemperatureRange
 
 
 class PlotSegment:
-    uuid: str
-    heat_range: HeatRange
-    temperature_range: TemperatureRange
+    """プロットの一部を表すクラスです。
+
+    Args:
+        start_heat (float): 熱量の開始値。
+        finish_heat (float): 熱量の終了値。
+        start_temperature (float): 温度の開始値。
+        finish_temperature (float): 温度の終了値。
+        uuid_ (Optional[str]): uuid。対応する流体がある場合はそのid。
+        state (StreamState): 対応する流体の状態。
+        reboiler_or_reactor (bool): 対応する流体がリボイラーもしくは反応器で用いられるか。
+
+    Attributes:
+        heat_range (HeatRange): 熱量領域。
+        temperature_range (TemperatureRange): 温度領域。
+        uuid (str): uuid。対応する流体がある場合はそのid。
+        state (StreamState): 対応する流体の状態。
+        reboiler_or_reactor (bool): 対応する流体がリボイラーもしくは反応器で用いられるか。
+    """
 
     def __init__(
         self,
@@ -33,7 +48,7 @@ class PlotSegment:
             self.uuid = uuid_
 
         self.state = state
-        self.reboiler_or_reactor = reboiler_or_reactor
+        self.state = reboiler_or_reactor
 
     def __str__(self) -> str:
         return (
@@ -171,6 +186,15 @@ class PlotSegment:
 
 
 def temp_diff(segment: PlotSegment, other: PlotSegment) -> tuple[float, float]:
+    """同じ熱量領域のプロットセグメントの入り口温度の差と出口温度の差を求める。
+
+    Args:
+        segment (PlotSegment): プロットセグメント。
+        ohter (PlotSegment): プロットセグメント。
+
+    Returns:
+        tuple[float, float]: 入り口温度差、出口温度差。
+    """
     hot_temp_start, hot_temp_finish = segment.temperatures()
     cold_temp_start, cold_temp_finish = other.temperatures()
 
