@@ -79,27 +79,27 @@ def get_temperatures(temp_ranges_: list[TemperatureRange]) -> list[float]:
     Returns:
         list[float]: 温度のリスト。
 
+    Raises:
+        ValueError: 温度領域が連続でない場合。
+
     Examples:
-        >>> get_heats([TemperatureRange(0, 10), TemperatureRange(10, 20)])
+        >>> get_temperatures([TemperatureRange(0, 10), TemperatureRange(10, 20)])
         [0, 10, 20]
+        >>> get_temperatures([TemperatureRange(0, 10), TemperatureRange(30, 40)])
+        Traceback (most recent call last):
+        ...
+        ValueError: 終了値と開始値が異なります。終了値: 10.000 開始値: 30.000
     """
     temp_ranges = sorted(temp_ranges_)
     if (values := is_continuous(temp_ranges)) is not None:
         raise ValueError(
             f'終了値と開始値が異なります。'
-            f'finish: {values[0]}, '
-            f'start: {values[1]}'
+            f'終了値: {values[0]:.3f} '
+            f'開始値: {values[1]:.3f}'
         )
+
     res: list[float] = []
     for i in range(len(temp_ranges)):
-        if i != len(temp_ranges) - 1:
-            if temp_ranges[i].finish != temp_ranges[i + 1].start:
-                raise ValueError(
-                    f'終了値と開始値が異なります。'
-                    f'finish: {temp_ranges[i].finish}, '
-                    f'start: {temp_ranges[i + 1].start}'
-                )
-
         res.append(temp_ranges[i].start)
         if i == len(temp_ranges) - 1:
             res.append(temp_ranges[i].finish)
