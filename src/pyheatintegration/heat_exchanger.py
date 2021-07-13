@@ -1,8 +1,72 @@
 import math
 from typing import Optional
 
+from .enums import StreamState
 from .heat_range import HeatRange
 from .plot_segment import PlotSegment
+
+
+OVERALL_HEAT_TRANSFER_COEFFICIENT = {
+    StreamState.LIQUID: {
+        StreamState.LIQUID: 300.0,
+        StreamState.GAS: 200.0,
+        StreamState.LIQUID_EVAPORATION: 1000.0
+    },
+    StreamState.GAS: {
+        StreamState.LIQUID: 200.0,
+        StreamState.GAS: 150.0,
+        StreamState.LIQUID_EVAPORATION: 500.0
+    },
+    StreamState.GAS_CONDENSATION: {
+        StreamState.LIQUID: 1000.0,
+        StreamState.GAS: 500.0,
+        StreamState.LIQUID_EVAPORATION: 1500.0
+    },
+}
+
+
+def get_overall_heat_transfer_coefficient(
+    hot_stream_state: StreamState,
+    cold_stream_state: StreamState
+) -> float:
+    """対応する総括伝熱係数を返します。
+
+    Args:
+        hot_stream_state (StreamState): 与熱流体の状態。
+        cold_stream_state (StreamState): 受熱流体の状態。
+
+    Returns:
+        float: 総括伝熱係数 [W/m2.K]
+
+    Exapmles:
+        >>> get_overall_heat_transfer_coefficient(StreamState.LIQUID, StreamState.LIQUID)
+        300.0
+    """
+    if hot_stream_state not in [
+        StreamState.LIQUID, StreamState.GAS, StreamState.GAS_CONDENSATION
+    ]:
+        raise ValueError(
+            '与熱流体の状態が不正です。対応する総括伝熱係数が設定されていません。'
+            f'状態: {hot_stream_state} '
+            '設定可能な状態: '
+            f'{StreamState.LIQUID}, '
+            f'{StreamState.GAS}, '
+            f'{StreamState.GAS_CONDENSATION}'
+        )
+
+    if cold_stream_state not in [
+        StreamState.LIQUID, StreamState.GAS, StreamState.LIQUID_EVAPORATION
+    ]:
+        raise ValueError(
+            '受熱流体の状態が不正です。対応する総括伝熱係数が設定されていません。'
+            f'状態: {cold_stream_state} '
+            '設定可能な状態: '
+            f'{StreamState.LIQUID}, '
+            f'{StreamState.GAS}, '
+            f'{StreamState.LIQUID_EVAPORATION}'
+        )
+
+    return OVERALL_HEAT_TRANSFER_COEFFICIENT[hot_stream_state][cold_stream_state]
 
 
 class HeatExchanger:
@@ -12,10 +76,14 @@ class HeatExchanger:
         heat_range (HeatRange): 熱交換の範囲。
         hot_stream_uuid (str): 与熱流体のid。
         cold_stream_uuid (str): 受熱流体のid。
+        hot_stream_state (StreamState): 与熱流体の状態。
+        cold_stream_state (StreamState): 受熱流体の状態。
         hot_temperature_range (TemperatureRange): 与熱流体の温度領域。
         cold_temperature_range (TemperatureRange): 受熱流体の温度領域。
         lmtd_parallel_flow (Optional[float]): 並流の場合の対数平均温度差。
         lmtd_counterflow (float): 向流の場合の対数平均温度差。
+        area_parallel_flow (Optional[float]): 並流の場合の必要面積 [m2]。
+        area_counterflow (float): 向流の場合の必要面積 [m2]。
         hot_plot_segment (PlotSegment): 与熱流体のプロットセグメント。
         cold_plot_segment (PlotSegment): 受熱流体のプロットセグメント。
     """
@@ -33,9 +101,23 @@ class HeatExchanger:
         self.cold_temperature_range = self.cold_plot_segment.temperature_range
         self.hot_stream_uuid = self.hot_plot_segment.uuid
         self.cold_stream_uuid = self.cold_plot_segment.uuid
+        self.hot_stream_state = self.hot_plot_segment.state
+        self.cold_stream_state = self.cold_plot_segment.state
+
+        self.overall_heat_transfer_coefficient = get_overall_heat_transfer_coefficient(
+            self.hot_stream_state,
+            self.cold_stream_state
+        )
 
         self.lmtd_parallel_flow = self.init_lmtd_pararell_flow()
         self.lmtd_counterflow = self.init_lmtd_counterflow()
+
+        if self.lmtd_parallel_flow is not None:
+            self.area_parallel_flow = self.heat_range.delta / self.lmtd_parallel_flow / self.overall_heat_transfer_coefficient
+        else:
+            self.area_parallel_flow = None
+
+        self.area_counterflow = self.heat_range.delta / self.lmtd_counterflow / self.overall_heat_transfer_coefficient
 
     def __repr__(self) -> str:
         return (

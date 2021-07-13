@@ -131,7 +131,8 @@ class Segment:
                 start_heat,
                 finish_heat,
                 *temperature_range(),
-                str(streams[i].id_)
+                str(streams[i].id_),
+                streams[i].state
             ))
             start_heat += heat
         return res
@@ -176,12 +177,14 @@ class Segment:
                 hot_heat_range_plot_segment[heat_range] = PlotSegment(
                     *heat_range(),
                     *self.hot_temperature_range(),
-                    hot_plot_segment.uuid
+                    hot_plot_segment.uuid,
+                    hot_plot_segment.state
                 )
                 cold_heat_range_plot_segment[heat_range] = PlotSegment(
                     *heat_range(),
                     *self.cold_temperature_range(),
-                    cold_plot_segment.uuid
+                    cold_plot_segment.uuid,
+                    cold_plot_segment.state
                 )
 
                 for heat_range_ in self.heat_ranges:
@@ -200,14 +203,16 @@ class Segment:
                         hot_heat_range_plot_segment[heat_range_] = PlotSegment(
                             *heat_range_(),
                             *self.hot_temperature_range(),
-                            hot_plot_segment.uuid
+                            hot_plot_segment.uuid,
+                            hot_plot_segment.state
                         )
 
                     if cold_plot_segment_ is not None and cold_plot_segment_.uuid == cold_plot_segment.uuid:
                         cold_heat_range_plot_segment[heat_range_] = PlotSegment(
                             *heat_range_(),
                             *self.cold_temperature_range(),
-                            cold_plot_segment.uuid
+                            cold_plot_segment.uuid,
+                            cold_plot_segment.state
                         )
 
         self.hot_plot_segments_splitted = sorted(list(hot_heat_range_plot_segment.values()))
