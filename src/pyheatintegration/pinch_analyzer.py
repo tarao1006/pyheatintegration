@@ -1,9 +1,12 @@
 from copy import deepcopy
 
 from .grand_composite_curve import GrandCompositeCurve
+from .heat_range import HeatRange, get_detailed_heat_ranges
 from .line import Line
 from .stream import Stream
 from .tq_diagram import TQDiagram, get_possible_minimum_temp_diff_range
+from .plot_segment import PlotSegment, get_plot_segments
+from .heat_exchanger import HeatExchanger
 
 
 class PinchAnalyzer:
@@ -65,6 +68,31 @@ class PinchAnalyzer:
             minimum_approach_temp_diff,
             self.pinch_point_temp
         )
+
+        all_heat_ranges = get_detailed_heat_ranges(
+            [
+                [plot_segment.heat_range for plot_segment in self.tq.hcc_merged],
+                [plot_segment.heat_range for plot_segment in self.tq.ccc_merged]
+            ]
+        )
+        hot_heat_range_plot_segment: dict[HeatRange, PlotSegment] = {
+            s.heat_range: s for s in get_plot_segments(all_heat_ranges, self.tq.hcc_merged)
+        }
+        cold_heat_range_plot_segment: dict[HeatRange, PlotSegment] = {
+            s.heat_range: s for s in get_plot_segments(all_heat_ranges, self.tq.ccc_merged)
+        }
+
+        self.heat_exchangers: list[HeatExchanger] = []
+        for heat_range in all_heat_ranges:
+            hot_plot_segment = hot_heat_range_plot_segment.get(heat_range, None)
+            cold_plot_segment = cold_heat_range_plot_segment.get(heat_range, None)
+
+            if hot_plot_segment is None or cold_plot_segment is None:
+                continue
+
+            self.heat_exchangers.append(
+                HeatExchanger(heat_range, hot_plot_segment, cold_plot_segment)
+            )
 
     def create_grand_composite_curve(self) -> tuple[list[float], list[float]]:
         """グランドコンポジットカーブを描くために必要な熱量と温度を返します。

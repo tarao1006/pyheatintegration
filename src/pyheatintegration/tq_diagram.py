@@ -3,7 +3,6 @@ from collections.abc import Callable
 from copy import copy, deepcopy
 from typing import Optional
 
-from .heat_exchanger import HeatExchanger
 from .heat_range import (REL_TOL_DIGIT, HeatRange, get_detailed_heat_ranges,
                          get_heat_ranges, get_heats)
 from .plot_segment import PlotSegment, get_plot_segments, is_continuous
@@ -429,15 +428,16 @@ class TQDiagram:
         pinch_point_temp (float): ピンチポイントの温度[℃]。
 
     Attributes:
-        heat_exchangers (list[HeatExchanger]): 熱交換器のリスト。
-        hot_lines (list[Line]): TQ線図の与熱複合線。
-        cold_linse (list[Line]): TQ線図の受熱複合線。
-        hot_lines_separated (list[Line]): 流体ごとに分割した与熱複合線。
-        cold_lines_separated (list[Line]): 流体ごとに分割した受熱複合線。
-        hot_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした与熱複合線。
-        cold_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした受熱複合線。
-        hot_lines_merged (list[Line]): 熱交換器を結合した与熱複合線。
-        cold_lines_merged (list[Line]): 熱交換器を結合した受熱複合線。
+        hot_lines (list[Line]): TQ線図の与熱複合線(プロット用の直線のリスト)。
+        cold_linse (list[Line]): TQ線図の受熱複合線(プロット用の直線のリスト)。
+        hot_lines_separated (list[Line]): 流体ごとに分割した与熱複合線(プロット用の直線のリスト)。
+        cold_lines_separated (list[Line]): 流体ごとに分割した受熱複合線(プロット用の直線のリスト)。
+        hot_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした与熱複合線(プロット用の直線のリスト)。
+        cold_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした受熱複合線(プロット用の直線のリスト)。
+        hot_lines_merged (list[Line]): 熱交換器を結合した与熱複合線(プロット用の直線のリスト)。
+        cold_lines_merged (list[Line]): 熱交換器を結合した受熱複合線(プロット用の直線のリスト)。
+        hcc_merged (list[PlotSegment]): 熱交換器を結合した与熱複合線。
+        ccc_merged (list[PlotSegment]): 熱交換器を結合した受熱複合線。
     """
 
     def __init__(
@@ -480,31 +480,6 @@ class TQDiagram:
         self.cold_lines_splitted = segments.cold_lines_splitted()
 
         # 結合可能なセグメント同士を結合する。
-        hcc_merged, ccc_merged = _merge_segments(segments)
-        self.hot_lines_merged = [plot_segment.line() for plot_segment in hcc_merged]
-        self.cold_lines_merged = [plot_segment.line() for plot_segment in ccc_merged]
-
-        all_heat_ranges = get_detailed_heat_ranges(
-            [
-                [plot_segment.heat_range for plot_segment in hcc_merged],
-                [plot_segment.heat_range for plot_segment in ccc_merged]
-            ]
-        )
-        hot_heat_range_plot_segment: dict[HeatRange, PlotSegment] = {
-            s.heat_range: s for s in get_plot_segments(all_heat_ranges, hcc_merged)
-        }
-        cold_heat_range_plot_segment: dict[HeatRange, PlotSegment] = {
-            s.heat_range: s for s in get_plot_segments(all_heat_ranges, ccc_merged)
-        }
-
-        self.heat_exchangers: list[HeatExchanger] = []
-        for heat_range in all_heat_ranges:
-            hot_plot_segment = hot_heat_range_plot_segment.get(heat_range, None)
-            cold_plot_segment = cold_heat_range_plot_segment.get(heat_range, None)
-
-            if hot_plot_segment is None or cold_plot_segment is None:
-                continue
-
-            self.heat_exchangers.append(
-                HeatExchanger(heat_range, hot_plot_segment, cold_plot_segment)
-            )
+        self.hcc_merged, self.ccc_merged = _merge_segments(segments)
+        self.hot_lines_merged = [plot_segment.line() for plot_segment in self.hcc_merged]
+        self.cold_lines_merged = [plot_segment.line() for plot_segment in self.ccc_merged]
