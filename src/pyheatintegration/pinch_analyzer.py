@@ -142,13 +142,13 @@ class PinchAnalyzer:
 
     def calculate_heat_exchanger_cost(
         self,
-        area: HeatExchanger,
+        area: float,
         reboiler_or_reactor: bool = False
     ) -> float:
         """熱交換器にかかるコストを返します。
 
         Args:
-            heat_exchanger (HeatExchanger): 熱交換器。
+            area (float): 熱交換器の面積。
             k (float): 係数。リボイラーまたは反応器の場合は2
 
         Returns:
