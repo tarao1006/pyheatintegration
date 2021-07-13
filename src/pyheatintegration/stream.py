@@ -24,17 +24,17 @@ class Stream:
         """流体を表すクラス。
 
         Args:
-            input_temperature (float): 入り口温度
-            output_temperature (float): 出口温度
-            heat_flow (float): 熱量
-            type_ (StreamType): 流体種
+            input_temperature (float): 入口温度。
+            output_temperature (float): 出口温度。
+            heat_flow (float): 熱量。
+            type_ (StreamType): 流体種。
             cost (float, optional): 流体のコスト。外部流体の場合のみ設定できる。
             id_ (str): 流体を区別する識別子。
 
         Raises:
             InvalidStreamError:
-                入り口温度と出口温度の大小関係と流体種の関係が不正である場合。また、外部流体
-                の熱量が0以外の場合、および外部流体以外の流体の熱量が0である場合。
+                入口温度と出口温度の大小関係と流体種の関係が不正である場合。また、外部流体の
+                熱量が0以外の場合、および外部流体以外の流体の熱量が0である場合。
         """
         if id_:
             self.id_ = id_
