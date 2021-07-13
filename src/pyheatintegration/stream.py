@@ -339,10 +339,10 @@ def get_temperature_range_streams(
     list[TemperatureRange],
     defaultdict[TemperatureRange, set[Stream]]
 ]:
-    """温度領域と、温度領域に属する流体を返します。
+    """温度領域に属する流体を返します。
 
     Args:
-        streams (list[Stream]): 流体。
+        streams (list[Stream]): 流体のリスト。
 
     Returns:
             list[list[TemperatureRange], defaultdict[TemperatureRange, set[Stream]]:
@@ -379,6 +379,15 @@ def get_temperature_range_streams(
 def get_temperature_range_heats(
     streams: list[Stream]
 ) -> tuple[list[TemperatureRange], dict[TemperatureRange, float]]:
+    """温度領域ごとに必要な熱量を返します。
+
+    Args:
+        streams (list[Stream]): 流体のリスト。
+
+    Returns:
+        tuple[list[TemperatureRange], dict[TemperatureRange, float]]:
+            温度領域、温度領域ごとの必要熱量。
+    """
     temp_ranges, temp_range_streams = get_temperature_range_streams(streams)
     tem_range_heats = {
         temp_range: sum(stream.heat() for stream in temp_range_streams[temp_range])
