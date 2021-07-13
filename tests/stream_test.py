@@ -3,7 +3,9 @@ from collections import defaultdict
 
 from src.pyheatintegration.enums import StreamType
 from src.pyheatintegration.errors import InvalidStreamError
-from src.pyheatintegration.stream import Stream, get_temperature_range_streams, is_valid_streams
+from src.pyheatintegration.stream import (Stream,
+                                          get_temperature_range_streams,
+                                          is_valid_streams)
 from src.pyheatintegration.temperature_range import TemperatureRange
 
 
