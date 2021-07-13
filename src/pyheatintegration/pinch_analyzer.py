@@ -48,7 +48,9 @@ class PinchAnalyzer:
         heat_exchangers (list[HeatExchanger]): 熱交換器のリスト。
         heat_exchanger_cost (float): 熱交換器のコスト。
 
-
+    Raises:
+        ValueError: 流体のidが重複している場合。また、最小接近温度差の値が不正な場合。
+        RuntimeError: 受熱流体、与熱流体が一つも指定されていない場合。
     """
 
     def __init__(
