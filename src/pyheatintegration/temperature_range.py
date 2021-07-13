@@ -75,7 +75,7 @@ def get_temperatures(temp_ranges_: list[TemperatureRange]) -> list[float]:
         list[float]: 温度のリスト。
 
     Examples:
-        >>> get_heats([TemperatureRange(0, 10), TemperatureRange(10, 20)])
+        >>> get_temperatures([TemperatureRange(0, 10), TemperatureRange(10, 20)])
         [0, 10, 20]
     """
     temp_ranges = sorted(temp_ranges_)
