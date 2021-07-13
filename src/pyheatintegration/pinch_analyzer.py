@@ -1,4 +1,5 @@
 from copy import deepcopy
+import math
 
 from .grand_composite_curve import GrandCompositeCurve
 from .heat_exchanger import HeatExchanger
@@ -94,6 +95,11 @@ class PinchAnalyzer:
                 HeatExchanger(heat_range, hot_plot_segment, cold_plot_segment)
             )
 
+        self.heat_exchanger_cost = sum(
+            self.calculate_heat_exchanger_cost(heat_exchanger.area_counterflow)
+            for heat_exchanger in self.heat_exchangers
+        )
+
     def create_grand_composite_curve(self) -> tuple[list[float], list[float]]:
         """グランドコンポジットカーブを描くために必要な熱量と温度を返します。
         """
@@ -130,3 +136,19 @@ class PinchAnalyzer:
             self.tq.hot_lines_merged,
             self.tq.cold_lines_merged
         )
+
+    def calculate_heat_exchanger_cost(
+        self,
+        area: HeatExchanger,
+        k: float = 1.0
+    ) -> float:
+        """熱交換器にかかるコストを返します。
+
+        Args:
+            heat_exchanger (HeatExchanger): 熱交換器。
+            k (float): 係数。リボイラーまたは反応器の場合は2
+
+        Returns:
+            float: コスト[円]。
+        """
+        return 1_500_000 * math.pow(area, 0.65) * k
