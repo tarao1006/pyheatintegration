@@ -7,7 +7,7 @@ from pyheatintegration import (PinchAnalyzer, Stream, StreamState, StreamType,
 
 
 def main():
-    df = pd.read_csv("./data.csv")
+    df = pd.read_csv("./data.csv").fillna({'reboiler_or_reactor': ''})
     streams = [
         Stream(
             row.input_temperature,
@@ -16,6 +16,7 @@ def main():
             StreamType(row.type),
             StreamState(row.state),
             cost=row.cost,
+            reboiler_or_reactor=bool(row.reboiler_or_reactor),
             id_=row.id
         ) for _, row in df.iterrows()]
 

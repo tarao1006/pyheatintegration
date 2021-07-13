@@ -86,6 +86,7 @@ class HeatExchanger:
         area_counterflow (float): 向流の場合の必要面積 [m2]。
         hot_plot_segment (PlotSegment): 与熱流体のプロットセグメント。
         cold_plot_segment (PlotSegment): 受熱流体のプロットセグメント。
+        reboiler_or_reactor (bool): リボイラーもしくは反応器で用いるか。
     """
 
     def __init__(
@@ -103,6 +104,7 @@ class HeatExchanger:
         self.cold_stream_uuid = self.cold_plot_segment.uuid
         self.hot_stream_state = self.hot_plot_segment.state
         self.cold_stream_state = self.cold_plot_segment.state
+        self.reboiler_or_reactor = self.hot_plot_segment.reboiler_or_reactor | self.cold_plot_segment.reboiler_or_reactor
 
         self.overall_heat_transfer_coefficient = get_overall_heat_transfer_coefficient(
             self.hot_stream_state,

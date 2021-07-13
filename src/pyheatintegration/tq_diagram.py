@@ -268,13 +268,15 @@ def _merge_segments(
                 *merged_heat_range(),
                 *merged_hot_temp_range(),
                 hot_plot_segment.uuid,
-                hot_plot_segment.state
+                hot_plot_segment.state,
+                hot_plot_segment.reboiler_or_reactor
             ))
             merged_cold_plot_segments.append(PlotSegment(
                 *merged_heat_range(),
                 *merged_cold_temp_range(),
                 cold_plot_segment.uuid,
-                cold_plot_segment.state
+                cold_plot_segment.state,
+                cold_plot_segment.reboiler_or_reactor
             ))
             merged_heat_ranges.extend([heat_ranges[i], heat_ranges[i + 1]])
 

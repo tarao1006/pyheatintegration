@@ -95,8 +95,14 @@ class PinchAnalyzer:
                 HeatExchanger(heat_range, hot_plot_segment, cold_plot_segment)
             )
 
+        for heat_exchanger in self.heat_exchangers:
+            print(heat_exchanger.reboiler_or_reactor)
+
         self.heat_exchanger_cost = sum(
-            self.calculate_heat_exchanger_cost(heat_exchanger.area_counterflow)
+            self.calculate_heat_exchanger_cost(
+                heat_exchanger.area_counterflow,
+                heat_exchanger.reboiler_or_reactor
+            )
             for heat_exchanger in self.heat_exchangers
         )
 
@@ -140,7 +146,7 @@ class PinchAnalyzer:
     def calculate_heat_exchanger_cost(
         self,
         area: HeatExchanger,
-        k: float = 1.0
+        reboiler_or_reactor: bool = False
     ) -> float:
         """熱交換器にかかるコストを返します。
 
@@ -151,4 +157,8 @@ class PinchAnalyzer:
         Returns:
             float: コスト[円]。
         """
+        if reboiler_or_reactor:
+            k = 2.0
+        else:
+            k = 1.0
         return 1_500_000 * math.pow(area, 0.65) * k
