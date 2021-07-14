@@ -8,8 +8,7 @@ REL_TOL_DIGIT = 9
 
 
 class HeatRange(BaseRange):
-    """熱量範囲を表すクラス。
-    """
+    """熱量範囲を表すクラス。"""
 
     def __contains__(self, temp: float, eps: float = 1e-6) -> bool:
         return self.start - eps <= temp <= self.finish + eps
@@ -18,10 +17,7 @@ class HeatRange(BaseRange):
 BaseRange.register(HeatRange)
 
 
-def merge_heat_range(
-    range_: HeatRange,
-    other: HeatRange
-) -> HeatRange:
+def merge_heat_range(range_: HeatRange, other: HeatRange) -> HeatRange:
     return merge(range_, other)
 
 

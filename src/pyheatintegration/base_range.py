@@ -132,10 +132,7 @@ class BaseRange(ABC):
 T = TypeVar('T', bound=BaseRange)
 
 
-def merge(
-    range_: T,
-    other: T
-) -> T:
+def merge(range_: T, other: T) -> T:
     """範囲を結合します。
 
     Args:
@@ -151,7 +148,8 @@ def merge(
     """
     if type(range_) != type(other):
         raise TypeError(
-            f'{repr(range_)}と{repr(other)}は型が異なるため、結合することができません。'
+            f'{repr(range_)}と{repr(other)}は、'
+            '型が異なるため、結合することができません。'
         )
 
     if not range_.mergeable(other):

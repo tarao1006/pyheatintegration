@@ -4,8 +4,7 @@ from .base_range import BaseRange, flatten, get_ranges, merge
 
 
 class TemperatureRange(BaseRange):
-    """温度範囲を表すクラス。
-    """
+    """温度範囲を表すクラス。"""
 
 
 BaseRange.register(TemperatureRange)
