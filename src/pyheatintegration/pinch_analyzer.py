@@ -6,7 +6,7 @@ from .heat_exchanger import HeatExchanger
 from .heat_range import HeatRange, get_detailed_heat_ranges
 from .line import Line
 from .plot_segment import PlotSegment, get_plot_segments
-from .stream import Stream
+from .stream import Stream, is_valid_streams
 from .tq_diagram import TQDiagram, get_possible_minimum_temp_diff_range
 
 
@@ -31,9 +31,11 @@ def calculate_heat_exchanger_cost(
 
 
 class PinchAnalyzer:
-    """エントリーポイント。
+    """流体のリストと最小接近温度差を設定し、グランドコンポジットカーブおよびTQ線図を作成します。
 
-    解析を行う場合はこのクラス経由で扱う。
+    解析を行う場合はこのクラス経由で扱います。このクラスを経由することで、流体のidが重複してい
+    ないことや、最小接近温度差が指定可能な値であるかを検証したのちに図を作成するため、予想外の
+    エラーが生じることを回避することができます。
 
     Args:
         streams_ (list[Stream]): 流体のリスト。
@@ -42,7 +44,7 @@ class PinchAnalyzer:
 
     Attributes:
         gcc (GrandCompositeCurve): グランドコンポジットカーブ。
-        tq (TQDiagram): TQ線図
+        tq (TQDiagram): TQ線図。
         streams (list[Stream]): 流体のリスト。
         pinch_point_temp (float): ピンチポイントの温度 [℃]。
         heat_exchangers (list[HeatExchanger]): 熱交換器のリスト。
@@ -64,22 +66,14 @@ class PinchAnalyzer:
         id_set: set[str] = set()
         for stream in streams:
             if stream.id_ in id_set:
-                raise ValueError('流体のidは一意である必要があります。')
+                raise ValueError(
+                    '流体のidは一意である必要があります。'
+                    f'重複しているid: {stream.id_}'
+                )
             id_set.add(stream.id_)
 
-        hot_streams = sorted(
-            [stream for stream in streams_ if stream.is_hot()],
-            key=lambda s: s.output_temperature()
-        )
-        cold_streams = sorted(
-            [stream for stream in streams_ if stream.is_cold()],
-            key=lambda s: s.input_temperature()
-        )
-
-        if not hot_streams:
-            raise RuntimeError('与熱流体は少なくとも1つは指定する必要があります。')
-        if not cold_streams:
-            raise RuntimeError('受熱流体は少なくとも1つは指定する必要があります。')
+        if not is_valid_streams(streams):
+            raise ValueError('与熱流体および受熱流体は少なくとも1つは指定する必要があります。')
 
         minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(
             streams,
@@ -91,7 +85,7 @@ class PinchAnalyzer:
                 "最小接近温度差が不正です。"
                 f"指定最小接近温度差 [℃]: {minimum_approach_temp_diff}, "
                 f"設定可能最小接近温度差 [℃]: {minimum_approach_temp_diff_range.start:.3f}"
-                f" - {minimum_approach_temp_diff_range.finish:.3f}"
+                f" ~ {minimum_approach_temp_diff_range.finish:.3f}"
             )
 
         self.gcc = GrandCompositeCurve(streams, minimum_approach_temp_diff)
