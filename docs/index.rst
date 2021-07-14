@@ -101,27 +101,27 @@ Getting Started
 
 * グランドコンポジットカーブ
 
-.. image:: images/grand_composite_curve.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/grand_composite_curve.png
    :width: 400
 
 * TQ線図
 
-.. image:: images/tq_diagram.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram.png
    :width: 400
 
 * TQ線図(流体ごとに分割)
 
-.. image:: images/tq_diagram_separeted.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_separeted.png
    :width: 400
 
 * TQ線図(流体ごとに分割。最小接近温度差を満たす。)
 
-.. image:: images/tq_diagram_splitted.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_splitted.png
    :width: 400
 
 * TQ線図(結合可能な熱交換器を結合。)
 
-.. image:: images/tq_diagram_merged.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_merged.png
     :width: 400
 
 Details
