@@ -22,7 +22,7 @@ copyright = '2021, tarao1006'
 author = 'tarao1006'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2.4'
+release = '0.3.0'
 
 
 # -- General configuration ---------------------------------------------------

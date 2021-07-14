@@ -1,8 +1,8 @@
 import math
+from collections.abc import Callable
 from copy import copy, deepcopy
-from typing import Callable, Optional
+from typing import Optional
 
-from .heat_exchanger import HeatExchanger
 from .heat_range import (REL_TOL_DIGIT, HeatRange, get_detailed_heat_ranges,
                          get_heat_ranges, get_heats)
 from .plot_segment import PlotSegment, get_plot_segments, is_continuous
@@ -267,12 +267,16 @@ def _merge_segments(
             merged_hot_plot_segments.append(PlotSegment(
                 *merged_heat_range(),
                 *merged_hot_temp_range(),
-                hot_plot_segment.uuid
+                hot_plot_segment.uuid,
+                hot_plot_segment.state,
+                hot_plot_segment.reboiler_or_reactor
             ))
             merged_cold_plot_segments.append(PlotSegment(
                 *merged_heat_range(),
                 *merged_cold_temp_range(),
-                cold_plot_segment.uuid
+                cold_plot_segment.uuid,
+                cold_plot_segment.state,
+                cold_plot_segment.reboiler_or_reactor
             ))
             merged_heat_ranges.extend([heat_ranges[i], heat_ranges[i + 1]])
 
@@ -286,30 +290,18 @@ def _merge_segments(
 
 
 def get_possible_minimum_temp_diff_range(
-    streams: list[Stream]
+    streams: list[Stream],
+    ignore_maximum: bool = False
 ) -> TemperatureRange:
     """設定可能な最小接近温度差を返します。
 
     Args:
         streams (list[Stream]): 流体のリスト。
+        ignore_maximum (bool): 最大値のチェックを無視するか。
 
     Returns:
         float: 可能な最小接近温度差[℃]。
     """
-    cold_streams = sorted(
-        [stream for stream in streams if stream.is_internal() and stream.is_cold()],
-        key=lambda stream: stream.input_temperature()
-    )
-    hot_streams = sorted(
-        [stream for stream in streams if stream.is_internal() and stream.is_hot()],
-        key=lambda stream: stream.output_temperature()
-    )
-
-    if not hot_streams:
-        raise RuntimeError('与熱流体は少なくとも1つは指定する必要があります。')
-    if not cold_streams:
-        raise RuntimeError('受熱流体は少なくとも1つは指定する必要があります。')
-
     hot_maximum_temp = max(
         stream.input_temperature() for stream in streams if stream.is_hot()
     )
@@ -326,14 +318,35 @@ def get_possible_minimum_temp_diff_range(
         stream.input_temperature() for stream in streams if stream.is_cold()
     )
 
-    maximum_minimum_approch_temp_diff = min(
-        hot_maximum_temp - cold_maximum_temp,
-        hot_minimum_temp - cold_minimum_temp
-    )
+    if ignore_maximum:
+        maximum_minimum_approch_temp_diff = hot_maximum_temp - cold_minimum_temp
+    else:
+        if hot_minimum_temp - cold_minimum_temp < 0:
+            raise ValueError(
+                '与熱流体の最低温度が受熱流体の最低温度を下回っています。'
+                f'与熱流体最低温度: {hot_minimum_temp:.3f} ℃ '
+                f'受熱流体最低温度: {cold_minimum_temp:.3f} ℃'
+            )
+
+        if hot_maximum_temp - cold_maximum_temp < 0:
+            raise ValueError(
+                '与熱流体の最高温度が受熱流体の最高温度を下回っています。'
+                f'与熱流体最高温度: {hot_maximum_temp:.3f} ℃ '
+                f'受熱流体最高温度: {cold_maximum_temp:.3f} ℃'
+            )
+
+        maximum_minimum_approch_temp_diff = min(
+            hot_maximum_temp - cold_maximum_temp,
+            hot_minimum_temp - cold_minimum_temp
+        )
 
     # 与熱流体と受熱流体のセグメントを得る。
-    initial_hcc = _create_composite_curve(hot_streams)
-    initial_ccc = _create_composite_curve(cold_streams)
+    initial_hcc = _create_composite_curve([
+        stream for stream in streams if stream.is_internal() and stream.is_hot()
+    ])
+    initial_ccc = _create_composite_curve([
+        stream for stream in streams if stream.is_internal() and stream.is_cold()
+    ])
 
     initial_heat_ranges = get_detailed_heat_ranges(
         [
@@ -390,6 +403,8 @@ def get_possible_minimum_temp_diff_range(
             hot_finish_temp - cold_finish_temp
         )
 
+    minimum_minimum_approch_temp_diff = max(0, minimum_minimum_approch_temp_diff)
+
     return TemperatureRange(
         maximum_minimum_approch_temp_diff,
         minimum_minimum_approch_temp_diff
@@ -405,15 +420,16 @@ class TQDiagram:
         pinch_point_temp (float): ピンチポイントの温度[℃]。
 
     Attributes:
-        heat_exchangers (list[HeatExchanger]): 熱交換器のリスト。
-        hot_lines (list[Line]): TQ線図の与熱複合線。
-        cold_linse (list[Line]): TQ線図の受熱複合線。
-        hot_lines_separated (list[Line]): 流体ごとに分割した与熱複合線。
-        cold_lines_separated (list[Line]): 流体ごとに分割した受熱複合線。
-        hot_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした与熱複合線。
-        cold_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした受熱複合線。
-        hot_lines_merged (list[Line]): 熱交換器を結合した与熱複合線。
-        cold_lines_merged (list[Line]): 熱交換器を結合した受熱複合線。
+        hot_lines (list[Line]): TQ線図の与熱複合線(プロット用の直線のリスト)。
+        cold_linse (list[Line]): TQ線図の受熱複合線(プロット用の直線のリスト)。
+        hot_lines_separated (list[Line]): 流体ごとに分割した与熱複合線(プロット用の直線のリスト)。
+        cold_lines_separated (list[Line]): 流体ごとに分割した受熱複合線(プロット用の直線のリスト)。
+        hot_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした与熱複合線(プロット用の直線のリスト)。
+        cold_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした受熱複合線(プロット用の直線のリスト)。
+        hot_lines_merged (list[Line]): 熱交換器を結合した与熱複合線(プロット用の直線のリスト)。
+        cold_lines_merged (list[Line]): 熱交換器を結合した受熱複合線(プロット用の直線のリスト)。
+        hcc_merged (list[PlotSegment]): 熱交換器を結合した与熱複合線。
+        ccc_merged (list[PlotSegment]): 熱交換器を結合した受熱複合線。
     """
 
     def __init__(
@@ -456,31 +472,6 @@ class TQDiagram:
         self.cold_lines_splitted = segments.cold_lines_splitted()
 
         # 結合可能なセグメント同士を結合する。
-        hcc_merged, ccc_merged = _merge_segments(segments)
-        self.hot_lines_merged = [plot_segment.line() for plot_segment in hcc_merged]
-        self.cold_lines_merged = [plot_segment.line() for plot_segment in ccc_merged]
-
-        all_heat_ranges = get_detailed_heat_ranges(
-            [
-                [plot_segment.heat_range for plot_segment in hcc_merged],
-                [plot_segment.heat_range for plot_segment in ccc_merged]
-            ]
-        )
-        hot_heat_range_plot_segment: dict[HeatRange, PlotSegment] = {
-            s.heat_range: s for s in get_plot_segments(all_heat_ranges, hcc_merged)
-        }
-        cold_heat_range_plot_segment: dict[HeatRange, PlotSegment] = {
-            s.heat_range: s for s in get_plot_segments(all_heat_ranges, ccc_merged)
-        }
-
-        self.heat_exchangers: list[HeatExchanger] = []
-        for heat_range in all_heat_ranges:
-            hot_plot_segment = hot_heat_range_plot_segment.get(heat_range, None)
-            cold_plot_segment = cold_heat_range_plot_segment.get(heat_range, None)
-
-            if hot_plot_segment is None or cold_plot_segment is None:
-                continue
-
-            self.heat_exchangers.append(
-                HeatExchanger(heat_range, hot_plot_segment, cold_plot_segment)
-            )
+        self.hcc_merged, self.ccc_merged = _merge_segments(segments)
+        self.hot_lines_merged = [plot_segment.line() for plot_segment in self.hcc_merged]
+        self.cold_lines_merged = [plot_segment.line() for plot_segment in self.ccc_merged]

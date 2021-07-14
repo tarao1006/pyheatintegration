@@ -2,23 +2,55 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.collections import LineCollection
 
-from pyheatintegration import (PinchAnalyzer, Stream, StreamType,
+from pyheatintegration import (PinchAnalyzer, Stream, StreamState, StreamType,
                                extract_x, y_range)
 
 
 def main():
-    df = pd.read_csv("./data.csv")
+    df = pd.read_csv("./data.csv").fillna({'reboiler_or_reactor': ''})
     streams = [
         Stream(
             row.input_temperature,
             row.output_temperature,
             row.heat_flow,
             StreamType(row.type),
-            row.cost
+            StreamState(row.state),
+            cost=row.cost,
+            reboiler_or_reactor=bool(row.reboiler_or_reactor),
+            id_=row.id
         ) for _, row in df.iterrows()]
 
     minimum_approach_temperature_difference = 10.0
     analyzer = PinchAnalyzer(streams, minimum_approach_temperature_difference)
+
+    print(
+        f"設定可能最小接近温度差 [℃]: {analyzer.minimum_approach_temp_diff_range.start:.3f}"
+        f" ~ {analyzer.minimum_approach_temp_diff_range.finish:.3f}"
+    )
+
+    print(f'ピンチポイント [℃]: {analyzer.gcc.minimum_pinch_point_temp}')
+    print(f'必要加熱量[W]: {analyzer.external_heating_demand:.3f}')
+    print(f'必要冷却量[W]: {analyzer.external_cooling_demand:.3f}')
+
+    for stream in analyzer.streams:
+        if stream.is_external() and stream.is_hot():
+            print(
+                f'外部与熱流体 id: {stream.id_} '
+                '\033[1m加熱量\033[0m [W]: '
+                f'{stream.heat():.3f} '
+                '\033[1mコスト\033[0m [円/s]: '
+                f'{stream.heat() * stream.cost:.3f}'
+            )
+
+    for stream in analyzer.streams:
+        if stream.is_external() and stream.is_cold():
+            print(
+                f'外部受熱流体 id: {stream.id_} '
+                '\033[1m冷却量\033[0m [W]: '
+                f'{stream.heat():.3f} '
+                '\033[1mコスト\033[0m [円/s]: '
+                f'{stream.heat() * stream.cost:.3f}'
+            )
 
     # グランドコンポジットカーブ
     heats, temps = analyzer.create_grand_composite_curve()
