@@ -46,6 +46,7 @@ class PinchAnalyzer:
         gcc (GrandCompositeCurve): グランドコンポジットカーブ。
         tq (TQDiagram): TQ線図。
         streams (list[Stream]): 流体のリスト。
+        minimum_approach_temp_diff_range (TemperatureRange): 最小接近温度差の指定可能範囲。
         pinch_point_temp (float): ピンチポイントの温度 [℃]。
         heat_exchangers (list[HeatExchanger]): 熱交換器のリスト。
         heat_exchanger_cost (float): 熱交換器のコスト。
@@ -77,57 +78,28 @@ class PinchAnalyzer:
         if not is_valid_streams(streams):
             raise ValueError('与熱流体および受熱流体は少なくとも1つは指定する必要があります。')
 
-        minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(
+        self.minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(
             streams,
             ignore_maximum
         )
 
-        if minimum_approach_temp_diff not in minimum_approach_temp_diff_range:
+        if minimum_approach_temp_diff not in self.minimum_approach_temp_diff_range:
             raise ValueError(
                 "最小接近温度差が不正です。"
                 f"指定最小接近温度差 [℃]: {minimum_approach_temp_diff}, "
-                f"設定可能最小接近温度差 [℃]: {minimum_approach_temp_diff_range.start:.3f}"
-                f" ~ {minimum_approach_temp_diff_range.finish:.3f}"
+                f"設定可能最小接近温度差 [℃]: {self.minimum_approach_temp_diff_range.start:.3f}"
+                f" ~ {self.minimum_approach_temp_diff_range.finish:.3f}"
             )
-
-        print(
-            f"設定可能最小接近温度差 [℃]: {minimum_approach_temp_diff_range.start:.3f}"
-            f" ~ {minimum_approach_temp_diff_range.finish:.3f}"
-        )
 
         self.gcc = GrandCompositeCurve(streams, minimum_approach_temp_diff)
         self.external_heating_demand = self.gcc.heats[-1]
         self.external_cooling_demand = self.gcc.heats[0]
-
-        print(f'ピンチポイント [℃]: {self.gcc.minimum_pinch_point_temp}')
-        print(f'必要加熱量[W]: {self.external_heating_demand:.3f}')
-        print(f'必要冷却量[W]: {self.external_cooling_demand:.3f}')
 
         id_heats = self.gcc.solve_external_heat()
         for stream in streams:
             for id_, heat in id_heats.items():
                 if stream.id_ == id_:
                     stream.update_heat(heat)
-
-        for stream in streams:
-            if stream.is_external() and stream.is_hot():
-                print(
-                    f'外部与熱流体 id: {stream.id_} '
-                    '\033[1m加熱量\033[0m [W]: '
-                    f'{stream.heat():.3f} '
-                    '\033[1mコスト\033[0m [円/s]: '
-                    f'{stream.heat() * stream.cost:.3f}'
-                )
-
-        for stream in streams:
-            if stream.is_external() and stream.is_cold():
-                print(
-                    f'外部受熱流体 id: {stream.id_} '
-                    '\033[1m冷却量\033[0m [W]: '
-                    f'{stream.heat():.3f} '
-                    '\033[1mコスト\033[0m [円/s]: '
-                    f'{stream.heat() * stream.cost:.3f}'
-                )
 
         self.streams = [stream for stream in streams if stream.heat() != 0]
         self.pinch_point_temp = self.gcc.maximum_pinch_point_temp
