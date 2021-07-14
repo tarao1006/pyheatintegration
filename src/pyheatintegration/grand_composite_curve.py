@@ -120,9 +120,7 @@ class GrandCompositeCurve:
         heated = 0.0
         not_heated = heats[-1]
 
-        streams.sort(
-            key=lambda stream: abs(stream.output_temperature() - pinch_point_temp)
-        )
+        streams.sort(key=lambda stream: stream.cost)
         for stream in streams:
             # すでに交換熱量が設定されている場合にはスキップする。
             if stream.heat() != 0:
