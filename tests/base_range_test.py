@@ -20,9 +20,17 @@ class TestBaseRange(unittest.TestCase):
 
     def test_base_range(self):
         base_range = BaseRange(0.0, 100.0)
+        other = BaseRange(200.0, 300.0)
 
         self.assertEqual(base_range.__repr__(), "BaseRange(0.0, 100.0)")
         self.assertEqual(base_range.__str__(), "0.0->100.0")
+        self.assertEqual(f"{base_range:.2f}", "0.00->100.00")
+
+        self.assertTrue(base_range != other)
+        self.assertTrue(base_range < other)
+        self.assertTrue(base_range <= other)
+        self.assertTrue(other > base_range)
+        self.assertTrue(other >= base_range)
 
         self.assertEqual(base_range.delta, 100)
         self.assertEqual(base_range.start, 0)

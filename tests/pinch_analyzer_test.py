@@ -6,7 +6,7 @@ from src.pyheatintegration.pinch_analyzer import PinchAnalyzer
 class TestPinchAnalyzer(unittest.TestCase):
 
     def test(self):
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             PinchAnalyzer([], 10.0)
 
 
