@@ -1,32 +1,16 @@
 import unittest
 
 from src.pyheatintegration.temperature_range import (
-    TemperatureRange, accumulate_heats, get_temperature_ranges,
-    get_temperature_transition, is_continuous)
+    TemperatureRange, accumulate_heats,
+    get_temperature_transition)
 
 
-class TestGetTemperatureRange(unittest.TestCase):
+class TestTemperatureRange(unittest.TestCase):
 
-    def test_sorted(self):
+    def test_temperature_range(self):
         self.assertEqual(
-            get_temperature_ranges([
-                0.0, 10.0, 20.0
-            ]),
-            [
-                TemperatureRange(0.0, 10.0),
-                TemperatureRange(10.0, 20.0)
-            ]
-        )
-
-    def test_unsorted(self):
-        self.assertEqual(
-            get_temperature_ranges([
-                0.0, 20.0, 10.0
-            ]),
-            [
-                TemperatureRange(0.0, 10.0),
-                TemperatureRange(10.0, 20.0)
-            ]
+            TemperatureRange(0, 10).__repr__(),
+            "TemperatureRange(0, 10)"
         )
 
 
@@ -42,24 +26,6 @@ class TestGetTemperatureTransition(unittest.TestCase):
                 TemperatureRange(40, 70),
                 TemperatureRange(70, 70)
             ]))
-        )
-
-
-class TestIsContinuous(unittest.TestCase):
-
-    def test_is_continuous(self):
-        self.assertIsNone(is_continuous([
-            TemperatureRange(0, 10),
-            TemperatureRange(10, 20),
-        ]))
-
-    def test_is_continuous_erorr(self):
-        self.assertEqual(
-            is_continuous([
-                TemperatureRange(0, 10),
-                TemperatureRange(5, 20),
-            ]),
-            (10, 5)
         )
 
 

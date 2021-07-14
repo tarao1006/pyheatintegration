@@ -1,6 +1,6 @@
 import unittest
 
-from src.pyheatintegration.base_range import BaseRange, minmax
+from src.pyheatintegration.base_range import BaseRange, minmax, merge, is_continuous, flatten, get_ranges
 
 
 class TestMinMax(unittest.TestCase):
@@ -46,6 +46,65 @@ class TestBaseRange(unittest.TestCase):
         self.assertTrue(base_range(), (10.0, 110.0))
         self.assertEqual(base_range.start, 10.0)
         self.assertEqual(base_range.finish, 110.0)
+
+
+class TestMerger(unittest.TestCase):
+
+    def test_should_success(self):
+        self.assertEqual(
+            merge(BaseRange(0, 10), BaseRange(10, 20)),
+            BaseRange(0, 20),
+        )
+
+    def test_should_raise_value_error(self):
+        with self.assertRaises(ValueError):
+            merge(BaseRange(0, 10), BaseRange(5, 20))
+
+
+class TestIsContinuous(unittest.TestCase):
+
+    def test_should_return_none(self):
+        self.assertIsNone(is_continuous([
+            BaseRange(0, 10),
+            BaseRange(10, 20),
+        ]))
+
+    def test_should_return_tuple(self):
+        self.assertEqual(
+            is_continuous([
+                BaseRange(0, 10),
+                BaseRange(5, 20),
+            ]),
+            (10, 5)
+        )
+
+
+class TestFlatten(unittest.TestCase):
+
+    def test_should_success(self):
+        self.assertEqual(
+            flatten([
+                BaseRange(0, 10),
+                BaseRange(10, 20),
+            ]),
+            [0, 10, 20]
+        )
+
+    def test_should_raise_value_error(self):
+        with self.assertRaises(ValueError):
+            flatten([
+                BaseRange(0, 10),
+                BaseRange(5, 20),
+            ])
+
+
+class TestGetRanges(unittest.TestCase):
+
+    def test_should_success(self):
+        self.assertEqual(
+            get_ranges([0, 10, 20], BaseRange),
+            [BaseRange(0, 10), BaseRange(10, 20)]
+        )
 
 
 if __name__ == '__main__':
