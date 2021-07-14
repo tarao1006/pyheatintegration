@@ -1,130 +1,28 @@
 from __future__ import annotations
 
-from typing import Optional
-
-from .base_range import BaseRange
+from .base_range import BaseRange, flatten, get_ranges, merge
 
 
 class TemperatureRange(BaseRange):
-    def __init__(self, start: float, finish: float):
-        super().__init__(start, finish)
-
-    def __repr__(self) -> str:
-        return f"TemperatureRange({self.start}, {self.finish})"
-
-    def merge(self, other: TemperatureRange) -> TemperatureRange:
-        """範囲を結合します。
-
-        Args:
-            other (TemperatureRange): 結合対象。
-
-        Returns:
-            TemperatureRange: 結合した範囲。
-
-        Example:
-            >>> a = TemperatureRange(0, 10)
-            >>> b = TemperatureRange(10, 20)
-            >>> a.merge(b)
-            TemperatureRange(0, 20)
-            >>> a = TemperatureRange(10, 20)
-            >>> b = TemperatureRange(0, 10)
-            >>> a.merge(b)
-            TemperatureRange(0, 20)
-
-        Raises:
-            ValueError: 結合可能ではない範囲が渡された場合。
-        """
-        if not self.mergeable(other):
-            raise ValueError(
-                "終了値と結合対象の開始値が同じか、"
-                "開始値と結合対象の終了値が同じである必要があります。"
-            )
-
-        if self.start == other.finish:
-            return TemperatureRange(other.start, self.finish)
-        return TemperatureRange(self.start, other.finish)
+    """温度範囲を表すクラス。"""
 
 
 BaseRange.register(TemperatureRange)
 
 
-def is_continuous(temp_ranges_: list[TemperatureRange]) -> Optional[tuple[float, float]]:
-    """範囲が連続であるかを検証します。
-
-    Args:
-        temp_ranges_ (list[HeatRange]): 温度領域のリスト。
-
-    Returns:
-        Optional[tuple[float, float]]: 領域が連続であるか。
-
-    Examples:
-        >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(10, 20)])
-        >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(20, 40)])
-        (10, 20)
-    """
-    temp_ranges = sorted(temp_ranges_)
-    for i in range(len(temp_ranges)):
-        if i != len(temp_ranges) - 1:
-            if temp_ranges[i].finish != temp_ranges[i + 1].start:
-                return temp_ranges[i].finish, temp_ranges[i + 1].start
-    return None
+def merge_temperature_range(
+    range_: TemperatureRange,
+    other: TemperatureRange
+) -> TemperatureRange:
+    return merge(range_, other)
 
 
-def get_temperatures(temp_ranges_: list[TemperatureRange]) -> list[float]:
-    """温度のリストを返します。
-
-    Args:
-        heat_ranges_ (list[TemperatureRange]): 温度領域のリスト。
-
-    Returns:
-        list[float]: 温度のリスト。
-
-    Raises:
-        ValueError: 温度領域が連続でない場合。
-
-    Examples:
-        >>> get_temperatures([TemperatureRange(0, 10), TemperatureRange(10, 20)])
-        [0, 10, 20]
-        >>> get_temperatures([TemperatureRange(0, 10), TemperatureRange(30, 40)])
-        Traceback (most recent call last):
-        ...
-        ValueError: 終了値と開始値が異なります。終了値: 10.000 開始値: 30.000
-    """
-    temp_ranges = sorted(temp_ranges_)
-    if (values := is_continuous(temp_ranges)) is not None:
-        raise ValueError(
-            f'終了値と開始値が異なります。'
-            f'終了値: {values[0]:.3f} '
-            f'開始値: {values[1]:.3f}'
-        )
-
-    res: list[float] = []
-    for i in range(len(temp_ranges)):
-        res.append(temp_ranges[i].start)
-        if i == len(temp_ranges) - 1:
-            res.append(temp_ranges[i].finish)
-
-    return res
+def get_temperature_ranges(temperatures: list[float]) -> list[TemperatureRange]:
+    return get_ranges(temperatures, TemperatureRange)
 
 
-def get_temperature_ranges(temperatures_: list[float]) -> list[TemperatureRange]:
-    """温度領域のリストを返します。
-
-    Args:
-        temperatures_ (list[float]): 温度のリスト。
-
-    Returns:
-        list[HeatRange]: 温度領域のリスト。
-
-    Examples:
-        >>> get_temperature_ranges([0, 10, 20])
-        [TemperatureRange(0, 10), TemperatureRange(10, 20)]
-    """
-    temperatures = sorted(temperatures_)
-    return [
-        TemperatureRange(temperatures[i], temperatures[i + 1])
-        for i in range(len(temperatures) - 1)
-    ]
+def flatten_temperature_ranges(temperature_ranges: list[TemperatureRange]) -> list[float]:
+    return flatten(temperature_ranges)
 
 
 def get_temperature_transition(

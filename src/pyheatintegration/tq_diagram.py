@@ -3,13 +3,13 @@ from collections.abc import Callable
 from copy import copy, deepcopy
 from typing import Optional
 
-from .heat_range import (REL_TOL_DIGIT, HeatRange, get_detailed_heat_ranges,
-                         get_heat_ranges, get_heats)
+from .heat_range import (REL_TOL_DIGIT, HeatRange, flatten_heat_ranges,
+                         get_heat_ranges, get_merged_heat_ranges, merge_heat_range)
 from .plot_segment import PlotSegment, get_plot_segments, is_continuous
 from .segment import Segment, Segments
 from .stream import Stream, get_temperature_range_heats
 from .temperature_range import (TemperatureRange, accumulate_heats,
-                                get_temperatures)
+                                flatten_temperature_ranges, merge_temperature_range)
 
 
 def _create_composite_curve(streams: list[Stream]) -> list[PlotSegment]:
@@ -22,7 +22,7 @@ def _create_composite_curve(streams: list[Stream]) -> list[PlotSegment]:
         list[PlotSegment]: 複合線。
     """
     t_ranges, t_range_heats = get_temperature_range_heats(streams)
-    t = get_temperatures(t_ranges)
+    t = flatten_temperature_ranges(t_ranges)
     h = accumulate_heats(t_ranges, t_range_heats)
     return [
         PlotSegment(h[i], h[i + 1], t[i], t[i + 1]) for i in range(len(h) - 1)
@@ -137,7 +137,7 @@ def _get_segments(
     Returns:
         Segments: セグメントのリスト。
     """
-    heat_ranges = get_detailed_heat_ranges(
+    heat_ranges = get_merged_heat_ranges(
         [
             [plot_segment.heat_range for plot_segment in hot_plot_segments],
             [plot_segment.heat_range for plot_segment in cold_plot_segments]
@@ -231,7 +231,7 @@ def _merge_segments(
         plot_segment for segment in segments for plot_segment in segment.cold_plot_segments_splitted
     ])
     heat_ranges = get_heat_ranges(
-        get_heats(
+        flatten_heat_ranges(
             sorted([
                 heat_range for segment in segments for heat_range in segment.heat_ranges
             ])
@@ -261,9 +261,9 @@ def _merge_segments(
 
         if hot_plot_segment.mergiable(next_hot_plot_segment) \
            and cold_plot_segment.mergiable(next_cold_plot_segment):
-            merged_heat_range = hot_plot_segment.heat_range.merge(next_hot_plot_segment.heat_range)
-            merged_hot_temp_range = hot_plot_segment.temperature_range.merge(next_hot_plot_segment.temperature_range)
-            merged_cold_temp_range = cold_plot_segment.temperature_range.merge(next_cold_plot_segment.temperature_range)
+            merged_heat_range = merge_heat_range(hot_plot_segment.heat_range, next_hot_plot_segment.heat_range)
+            merged_hot_temp_range = merge_temperature_range(hot_plot_segment.temperature_range, next_hot_plot_segment.temperature_range)
+            merged_cold_temp_range = merge_temperature_range(cold_plot_segment.temperature_range, next_cold_plot_segment.temperature_range)
             merged_hot_plot_segments.append(PlotSegment(
                 *merged_heat_range(),
                 *merged_hot_temp_range(),
@@ -348,7 +348,7 @@ def get_possible_minimum_temp_diff_range(
         stream for stream in streams if stream.is_internal() and stream.is_cold()
     ])
 
-    initial_heat_ranges = get_detailed_heat_ranges(
+    initial_heat_ranges = get_merged_heat_ranges(
         [
             [plot_segment.heat_range for plot_segment in initial_hcc],
             [plot_segment.heat_range for plot_segment in initial_ccc]
@@ -369,7 +369,7 @@ def get_possible_minimum_temp_diff_range(
             plot_segment.shift_heat(gap)
 
     # ずらした複合線の与熱流体と受熱流体を合わせた熱量領域を得る。
-    heat_ranges = get_detailed_heat_ranges(
+    heat_ranges = get_merged_heat_ranges(
         [
             [plot_segment.heat_range for plot_segment in hcc],
             [plot_segment.heat_range for plot_segment in ccc]

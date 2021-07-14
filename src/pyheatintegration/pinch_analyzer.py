@@ -3,7 +3,7 @@ from copy import deepcopy
 
 from .grand_composite_curve import GrandCompositeCurve
 from .heat_exchanger import HeatExchanger
-from .heat_range import HeatRange, get_detailed_heat_ranges
+from .heat_range import HeatRange, get_merged_heat_ranges
 from .line import Line
 from .plot_segment import PlotSegment, get_plot_segments
 from .stream import Stream, is_valid_streams
@@ -109,7 +109,7 @@ class PinchAnalyzer:
             self.pinch_point_temp
         )
 
-        all_heat_ranges = get_detailed_heat_ranges(
+        all_heat_ranges = get_merged_heat_ranges(
             [
                 [plot_segment.heat_range for plot_segment in self.tq.hcc_merged],
                 [plot_segment.heat_range for plot_segment in self.tq.ccc_merged]

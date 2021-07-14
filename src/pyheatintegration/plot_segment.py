@@ -4,9 +4,9 @@ import uuid
 from collections.abc import Iterable
 from typing import Optional
 
+from .base_range import is_continuous as is_continuous_ranges
 from .enums import StreamState
 from .heat_range import HeatRange
-from .heat_range import is_continuous as is_continuous_heat_ranges
 from .line import Line
 from .temperature_range import TemperatureRange
 
@@ -353,6 +353,6 @@ def is_continuous(
     Returns:
         Optional[tuple[float, float]]: 領域が連続であるか。
     """
-    return is_continuous_heat_ranges(
+    return is_continuous_ranges(
         sorted([plot_segment.heat_range for plot_segment in plot_segments])
     )

@@ -2,7 +2,8 @@ from collections import UserList
 from copy import deepcopy
 from typing import Optional, cast
 
-from .heat_range import REL_TOL_DIGIT, HeatRange, get_heat_ranges, get_heats
+from .heat_range import (REL_TOL_DIGIT, HeatRange, flatten_heat_ranges,
+                         get_heat_ranges)
 from .line import Line
 from .plot_segment import PlotSegment, get_plot_segments, temp_diff
 from .stream import Stream
@@ -64,11 +65,11 @@ class Segment:
                 self.cold_temperature_range
             )
 
-        hot_heats = get_heats([
+        hot_heats = flatten_heat_ranges([
             plot_segment.heat_range
             for plot_segment in self.hot_plot_segments_separated_streams
         ])
-        cold_heats = get_heats([
+        cold_heats = flatten_heat_ranges([
             plot_segment.heat_range
             for plot_segment in self.cold_plot_segments_separated_streams
         ])
