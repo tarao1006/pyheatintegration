@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
-
-from .base_range import BaseRange
+from .base_range import BaseRange, is_continuous
 
 
 class TemperatureRange(BaseRange):
@@ -44,32 +42,32 @@ class TemperatureRange(BaseRange):
 BaseRange.register(TemperatureRange)
 
 
-def is_continuous(
-    temp_ranges_: list[TemperatureRange]
-) -> Optional[tuple[float, float]]:
-    """温度領域のリストが連続であるかを検証します。
+# def is_continuous(
+#     temp_ranges_: list[TemperatureRange]
+# ) -> Optional[tuple[float, float]]:
+#     """温度領域のリストが連続であるかを検証します。
 
-    Args:
-        heat_ranges_ (list[TemperatureRange]): 温度領域のリスト。
+#     Args:
+#         heat_ranges_ (list[TemperatureRange]): 温度領域のリスト。
 
-    Returns:
-        Optional[tuple[float, float]]:
-            温度領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
-            所の値をタプルで返します。
+#     Returns:
+#         Optional[tuple[float, float]]:
+#             温度領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
+#             所の値をタプルで返します。
 
-    Examples:
-        >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(10, 20)])
-        >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(15, 20)])
-        (10, 15)
-        >>> is_continuous([TemperatureRange(0, 15), TemperatureRange(10, 20)])
-        (15, 10)
-    """
-    temp_ranges = sorted(temp_ranges_)
-    for i in range(len(temp_ranges)):
-        if i != len(temp_ranges) - 1:
-            if temp_ranges[i].finish != temp_ranges[i + 1].start:
-                return temp_ranges[i].finish, temp_ranges[i + 1].start
-    return None
+#     Examples:
+#         >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(10, 20)])
+#         >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(15, 20)])
+#         (10, 15)
+#         >>> is_continuous([TemperatureRange(0, 15), TemperatureRange(10, 20)])
+#         (15, 10)
+#     """
+#     temp_ranges = sorted(temp_ranges_)
+#     for i in range(len(temp_ranges)):
+#         if i != len(temp_ranges) - 1:
+#             if temp_ranges[i].finish != temp_ranges[i + 1].start:
+#                 return temp_ranges[i].finish, temp_ranges[i + 1].start
+#     return None
 
 
 def get_temperatures(temp_ranges_: list[TemperatureRange]) -> list[float]:

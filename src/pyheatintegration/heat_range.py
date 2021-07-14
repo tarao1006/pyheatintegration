@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Iterable, Optional
+from typing import Iterable
 
-from .base_range import BaseRange
+from .base_range import BaseRange, is_continuous
 
 REL_TOL_DIGIT = 9
 
@@ -69,32 +69,32 @@ def get_heat_ranges(heats_: list[float]) -> list[HeatRange]:
     ]
 
 
-def is_continuous(
-    heat_ranges_: list[HeatRange]
-) -> Optional[tuple[float, float]]:
-    """熱量領域のリストが連続であるかを検証します。
+# def is_continuous(
+#     heat_ranges_: list[HeatRange]
+# ) -> Optional[tuple[float, float]]:
+#     """熱量領域のリストが連続であるかを検証します。
 
-    Args:
-        heat_ranges_ (list[HeatRange]): 熱量領域のリスト。
+#     Args:
+#         heat_ranges_ (list[HeatRange]): 熱量領域のリスト。
 
-    Returns:
-        Optional[tuple[float, float]]:
-            熱量領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
-            所の値をタプルで返します。
+#     Returns:
+#         Optional[tuple[float, float]]:
+#             熱量領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
+#             所の値をタプルで返します。
 
-    Examples:
-        >>> is_continuous([HeatRange(0, 10), HeatRange(10, 20)])
-        >>> is_continuous([HeatRange(0, 10), HeatRange(15, 20)])
-        (10, 15)
-        >>> is_continuous([HeatRange(0, 15), HeatRange(10, 20)])
-        (15, 10)
-    """
-    heat_ranges = sorted(heat_ranges_)
-    for i in range(len(heat_ranges)):
-        if i != len(heat_ranges) - 1:
-            if heat_ranges[i].finish != heat_ranges[i + 1].start:
-                return heat_ranges[i].finish, heat_ranges[i + 1].start
-    return None
+#     Examples:
+#         >>> is_continuous([HeatRange(0, 10), HeatRange(10, 20)])
+#         >>> is_continuous([HeatRange(0, 10), HeatRange(15, 20)])
+#         (10, 15)
+#         >>> is_continuous([HeatRange(0, 15), HeatRange(10, 20)])
+#         (15, 10)
+#     """
+#     heat_ranges = sorted(heat_ranges_)
+#     for i in range(len(heat_ranges)):
+#         if i != len(heat_ranges) - 1:
+#             if heat_ranges[i].finish != heat_ranges[i + 1].start:
+#                 return heat_ranges[i].finish, heat_ranges[i + 1].start
+#     return None
 
 
 def get_heats(heat_ranges_: list[HeatRange]) -> list[float]:

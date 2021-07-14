@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from typing import Optional, TypeVar
 
 
 def minmax(a: float, b: float) -> tuple[float, float]:
@@ -126,3 +127,91 @@ class BaseRange(ABC):
             False
         """
         return self.start == other.finish or self.finish == other.start
+
+
+T = TypeVar('T', bound=BaseRange)
+
+
+def is_continuous(
+    ranges_: list[T]
+) -> Optional[tuple[float, float]]:
+    """温度領域のリストが連続であるかを検証します。
+
+    Args:
+        heat_ranges_ (list[T]): 温度領域のリスト。
+
+    Returns:
+        Optional[tuple[float, float]]:
+            温度領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
+            所の値をタプルで返します。
+
+    Examples:
+        >>> is_continuous([T(0, 10), T(10, 20)])
+        >>> is_continuous([T(0, 10), T(15, 20)])
+        (10, 15)
+        >>> is_continuous([T(0, 15), T(10, 20)])
+        (15, 10)
+    """
+    ranges = sorted(ranges_)
+    for i in range(len(ranges)):
+        if i != len(ranges) - 1:
+            if ranges[i].finish != ranges[i + 1].start:
+                return ranges[i].finish, ranges[i + 1].start
+    return None
+
+
+def flatten(ranges_: list[T]) -> list[float]:
+    """領域を平坦化したリストを返します。
+
+    Args:
+        heat_ranges_ (list[T]): 領域のリスト。
+
+    Returns:
+        list[float]: 平坦化されたリスト。
+
+    Raises:
+        ValueError: 領域が連続でない場合。
+
+    Examples:
+        >>> get_temperatures([T(0, 10), T(10, 20)])
+        [0, 10, 20]
+        >>> get_temperatures([T(0, 10), T(30, 40)])
+        Traceback (most recent call last):
+        ...
+        ValueError: 終了値と開始値が異なります。終了値: 10.000 開始値: 30.000
+    """
+    ranges = sorted(ranges_)
+    if (values := is_continuous(ranges)) is not None:
+        raise ValueError(
+            f'終了値と開始値が異なります。'
+            f'終了値: {values[0]:.3f} '
+            f'開始値: {values[1]:.3f}'
+        )
+
+    res: list[float] = []
+    for i in range(len(ranges)):
+        res.append(ranges[i].start)
+        if i == len(ranges) - 1:
+            res.append(ranges[i].finish)
+
+    return res
+
+
+def get_ranges(values: list[float]) -> list[T]:
+    """領域のリストを返します。
+
+    Args:
+        temperatures_ (list[float]): 温度のリスト。
+
+    Returns:
+        list[T]: 温度領域のリスト。
+
+    Examples:
+        >>> get_temperature_ranges([0, 10, 20])
+        [T(0, 10), T(10, 20)]
+    """
+    values = sorted(values)
+    return [
+        T(values[i], values[i + 1])
+        for i in range(len(values) - 1)
+    ]
