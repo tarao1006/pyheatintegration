@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 from .base_range import BaseRange, flatten, get_ranges, merge
 
 REL_TOL_DIGIT = 9
@@ -30,13 +28,13 @@ def flatten_heat_ranges(heat_ranges: list[HeatRange]) -> list[float]:
 
 
 def get_merged_heat_ranges(
-    heat_ranges_list: Iterable[list[HeatRange]]
+    heat_ranges_list: list[list[HeatRange]]
 ) -> list[HeatRange]:
     """複数の熱量領域のリストを合わせた熱量領域を返します。
 
     Args:
-        plot_segments_list (Iterable[list[PlotSegment]]):
-            熱量領域のリストのイテラブル。
+        plot_segments_list (list[list[PlotSegment]]):
+            熱量領域のリストのリスト。
 
     Returns:
         list[HeatRange]: 結合後の熱量領域のリスト。

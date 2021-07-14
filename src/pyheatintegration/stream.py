@@ -284,7 +284,7 @@ class Stream:
         全ての温度をとる場合のみTrueを返します。
 
         Args:
-            temperatures (list[float]): 検証したい温度のリスト。
+            temperatures (Iterable[float]): 検証したい温度のリスト。
 
         Returns:
             bool: 与えられた複数の温度をとるかどうか。

@@ -102,7 +102,7 @@ class PinchAnalyzer:
                     stream.update_heat(heat)
 
         self.streams = [stream for stream in streams if stream.heat() != 0]
-        self.pinch_point_temp = self.gcc.maximum_pinch_point_temp
+        self.pinch_point_temp = self.gcc.pinch_point_temp()
         self.tq = TQDiagram(
             self.streams,
             minimum_approach_temp_diff,
