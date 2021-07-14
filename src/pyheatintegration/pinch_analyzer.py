@@ -49,6 +49,8 @@ class PinchAnalyzer:
         pinch_point_temp (float): ピンチポイントの温度 [℃]。
         heat_exchangers (list[HeatExchanger]): 熱交換器のリスト。
         heat_exchanger_cost (float): 熱交換器のコスト。
+        external_heating_demand (float): 必要加熱量[W]。
+        external_cooling_demand (float): 必要冷却熱量[W]。
 
     Raises:
         ValueError: 流体のidが重複している場合。また、最小接近温度差の値が不正な場合。
@@ -89,6 +91,9 @@ class PinchAnalyzer:
             )
 
         self.gcc = GrandCompositeCurve(streams, minimum_approach_temp_diff)
+        self.external_heating_demand = self.gcc.heats[-1]
+        self.external_cooling_demand = self.gcc.heats[0]
+
         id_heats = self.gcc.solve_external_heat()
         for stream in streams:
             for id_, heat in id_heats.items():
