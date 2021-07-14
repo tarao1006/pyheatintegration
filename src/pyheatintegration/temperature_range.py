@@ -14,9 +14,9 @@ class TemperatureRange(BaseRange):
             other (TemperatureRange): 結合対象。
 
         Returns:
-            TemperatureRange: 結合した範囲。
+            TemperatureRange: 結合後の範囲。
 
-        Example:
+        Examples:
             >>> a = TemperatureRange(0, 10)
             >>> b = TemperatureRange(10, 20)
             >>> a.merge(b)
@@ -31,6 +31,7 @@ class TemperatureRange(BaseRange):
         """
         if not self.mergeable(other):
             raise ValueError(
+                f"{repr(self)}と{repr(other)}は結合することができません。"
                 "終了値と結合対象の開始値が同じか、"
                 "開始値と結合対象の終了値が同じである必要があります。"
             )
@@ -43,19 +44,25 @@ class TemperatureRange(BaseRange):
 BaseRange.register(TemperatureRange)
 
 
-def is_continuous(temp_ranges_: list[TemperatureRange]) -> Optional[tuple[float, float]]:
-    """範囲が連続であるかを検証します。
+def is_continuous(
+    temp_ranges_: list[TemperatureRange]
+) -> Optional[tuple[float, float]]:
+    """温度領域のリストが連続であるかを検証します。
 
     Args:
-        temp_ranges_ (list[HeatRange]): 温度領域のリスト。
+        heat_ranges_ (list[TemperatureRange]): 温度領域のリスト。
 
     Returns:
-        Optional[tuple[float, float]]: 領域が連続であるか。
+        Optional[tuple[float, float]]:
+            温度領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
+            所の値をタプルで返します。
 
     Examples:
         >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(10, 20)])
-        >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(20, 40)])
-        (10, 20)
+        >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(15, 20)])
+        (10, 15)
+        >>> is_continuous([TemperatureRange(0, 15), TemperatureRange(10, 20)])
+        (15, 10)
     """
     temp_ranges = sorted(temp_ranges_)
     for i in range(len(temp_ranges)):
