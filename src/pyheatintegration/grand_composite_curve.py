@@ -5,6 +5,49 @@ from .stream import Stream, get_temperature_range_streams
 from .temperature_range import TemperatureRange, get_temperatures
 
 
+def _get_heats(
+    temp_ranges: list[TemperatureRange],
+    temp_range_streams: defaultdict[TemperatureRange, set[Stream]]
+) -> list[float]:
+    """温度変化領域ごとの熱量変化を求めます。
+
+    Args:
+        temp_ranges: list[TemperatureRange]: 温度領域のリスト。
+        temp_range_lacking_heat: dict[TemperatureRange, float]:
+            温度領域ごとの過不足熱量。
+
+    Returns:
+        list[float]: 熱量のリスト。
+    """
+    temp_range_lacking_heat = _get_lacking_heats(temp_range_streams)
+
+    temp_ranges.sort()
+    heats = [0.0] * (len(temp_ranges) + 1)
+    for i, temp_range in enumerate(temp_ranges):
+        heats[i + 1] = heats[i] - temp_range_lacking_heat[temp_range]
+    min_heat = min(heats)
+
+    return [heat - min_heat for heat in heats]
+
+
+def _get_lacking_heats(
+    temp_range_streams: defaultdict[TemperatureRange, set[Stream]]
+) -> defaultdict[TemperatureRange, float]:
+    """温度領域ごとの不足熱量を求めます.
+
+    Args:
+        temp_range_streams defaultdict[float, set[Stream]]:
+            温度領域ごとの流体のセット。
+
+    Returns:
+        defaultdict[TemperatureRange, float]: 温度領域ごとの過不足熱量。
+    """
+    return defaultdict(int, {
+        temp_range: sum([s.heat() for s in streams if s.is_hot()]) - sum([s.heat() for s in streams if s.is_cold()])
+        for temp_range, streams in temp_range_streams.items()
+    })
+
+
 class GrandCompositeCurve:
     """グランドコンポジットカーブを作成するために必要な情報を得るためのクラス。
 
@@ -48,12 +91,9 @@ class GrandCompositeCurve:
             stream for stream in streams if stream.is_internal()
         ])
         self.temps = get_temperatures(temp_ranges)
-        self.heats = self._get_heats(
-            temp_ranges,
-            self._lacking_heats(temp_range_streams)
-        )
+        self.heats = _get_heats(temp_ranges, temp_range_streams)
 
-        pinch_point_info = self._set_pinch_point()
+        pinch_point_info = self._get_pinch_point()
         self.maximum_pinch_point_temp = pinch_point_info[0]
         self.maximum_pinch_point_index = pinch_point_info[1]
         self.minimum_pinch_point_temp = pinch_point_info[2]
@@ -61,6 +101,21 @@ class GrandCompositeCurve:
 
         self.hot_utility_target = self.heats[-1]
         self.cold_utility_target = self.heats[0]
+
+    def _get_pinch_point(self) -> tuple[float, int, float, int]:
+        """ピンチポイントとピンチポイントのインデックスを求めます。
+        """
+        pinch_point_indexes = [
+            i for i, heat in enumerate(self.heats) if heat == 0
+        ]
+        pinch_points = [self.temps[i] for i in pinch_point_indexes]
+
+        return (
+            pinch_points[-1],
+            pinch_point_indexes[-1],
+            pinch_points[0],
+            pinch_point_indexes[0]
+        )
 
     def solve_external_heat(self) -> dict[str, float]:
         """外部流体による熱交換量を求めます.
@@ -92,71 +147,6 @@ class GrandCompositeCurve:
             stream.id_: stream.heat()
             for stream in updated_external_streams
         }
-
-    @classmethod
-    def _lacking_heats(
-        cls,
-        temp_range_streams: defaultdict[TemperatureRange, set[Stream]]
-    ) -> defaultdict[TemperatureRange, float]:
-        """温度領域ごとの不足熱量を求めます.
-
-        Args:
-            temp_range_streams defaultdict[float, set[Stream]]:
-                温度領域ごとの流体のセット。
-
-        Returns:
-            defaultdict[TemperatureRange, float]: 温度領域ごとの過不足熱量。
-        """
-        return defaultdict(int, {
-            temp_range: sum([s.heat() for s in streams if s.is_hot()]) - sum([s.heat() for s in streams if s.is_cold()])
-            for temp_range, streams in temp_range_streams.items()
-        })
-
-    @classmethod
-    def _get_heats(
-        cls,
-        temp_ranges: list[TemperatureRange],
-        temp_range_lacking_heat: dict[TemperatureRange, float]
-    ) -> list[float]:
-        """温度変化領域ごとの熱量変化を求めます。
-
-        Args:
-            temp_ranges: list[TemperatureRange]: 温度領域のリスト。
-            temp_range_lacking_heat: dict[TemperatureRange, float]:
-                温度領域ごとの過不足熱量。
-
-        Returns:
-            list[float]: 熱量のリスト。
-        """
-        temp_ranges.sort()
-        heats = [0.0] * (len(temp_ranges) + 1)
-        for i, temp_range in enumerate(temp_ranges):
-            heats[i + 1] = heats[i] - temp_range_lacking_heat[temp_range]
-        min_heat = min(heats)
-
-        return [heat - min_heat for heat in heats]
-
-    def _set_pinch_point(self) -> tuple[float, int, float, int]:
-        """ピンチポイントとピンチポイントのインデックスを求めます。
-        """
-        # heat == 0は必ず存在する。
-        if 0 not in self.heats:
-            raise ValueError("heatに0が存在しません。")
-
-        pinch_point_indexes = [
-            i for i, heat in enumerate(self.heats) if heat == 0
-        ]
-        pinch_points = [self.temps[i] for i in pinch_point_indexes]
-
-        if any(pinch_point_indexes) in [0, len(self.heats) - 1]:
-            print("ピンチポイントの値が不正である可能性があります。")
-
-        return (
-            pinch_points[-1],
-            pinch_point_indexes[-1],
-            pinch_points[0],
-            pinch_point_indexes[0]
-        )
 
     def _update_external_streams(
             self,
