@@ -302,39 +302,25 @@ def get_possible_minimum_temp_diff_range(
     Returns:
         float: 可能な最小接近温度差[℃]。
     """
-    cold_streams = sorted(
-        [stream for stream in streams if stream.is_internal() and stream.is_cold()],
-        key=lambda stream: stream.input_temperature()
-    )
-    hot_streams = sorted(
-        [stream for stream in streams if stream.is_internal() and stream.is_hot()],
-        key=lambda stream: stream.output_temperature()
+    hot_maximum_temp = max(
+        stream.input_temperature() for stream in streams if stream.is_hot()
     )
 
-    if not hot_streams:
-        raise RuntimeError('与熱流体は少なくとも1つは指定する必要があります。')
-    if not cold_streams:
-        raise RuntimeError('受熱流体は少なくとも1つは指定する必要があります。')
+    hot_minimum_temp = min(
+        stream.output_temperature() for stream in streams if stream.is_hot()
+    )
+
+    cold_maximum_temp = max(
+        stream.output_temperature() for stream in streams if stream.is_cold()
+    )
+
+    cold_minimum_temp = min(
+        stream.input_temperature() for stream in streams if stream.is_cold()
+    )
 
     if ignore_maximum:
-        maximum_minimum_approch_temp_diff = math.inf
+        maximum_minimum_approch_temp_diff = hot_maximum_temp - cold_minimum_temp
     else:
-        hot_maximum_temp = max(
-            stream.input_temperature() for stream in streams if stream.is_hot()
-        )
-
-        hot_minimum_temp = min(
-            stream.output_temperature() for stream in streams if stream.is_hot()
-        )
-
-        cold_maximum_temp = max(
-            stream.output_temperature() for stream in streams if stream.is_cold()
-        )
-
-        cold_minimum_temp = min(
-            stream.input_temperature() for stream in streams if stream.is_cold()
-        )
-
         if hot_minimum_temp - cold_minimum_temp < 0:
             raise ValueError(
                 '与熱流体の最低温度が受熱流体の最低温度を下回っています。'
@@ -355,8 +341,12 @@ def get_possible_minimum_temp_diff_range(
         )
 
     # 与熱流体と受熱流体のセグメントを得る。
-    initial_hcc = _create_composite_curve(hot_streams)
-    initial_ccc = _create_composite_curve(cold_streams)
+    initial_hcc = _create_composite_curve([
+        stream for stream in streams if stream.is_internal() and stream.is_hot()
+    ])
+    initial_ccc = _create_composite_curve([
+        stream for stream in streams if stream.is_internal() and stream.is_cold()
+    ])
 
     initial_heat_ranges = get_detailed_heat_ranges(
         [
