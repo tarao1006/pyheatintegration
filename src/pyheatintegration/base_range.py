@@ -60,7 +60,7 @@ class BaseRange(ABC):
         return hash((self.start, self.finish))
 
     def __repr__(self) -> str:
-        return f"BaseRange({self.start}, {self.finish})"
+        return f"{self.__class__.__name__}({self.start}, {self.finish})"
 
     def __str__(self) -> str:
         return f"{self.start}->{self.finish}"

@@ -8,11 +8,6 @@ REL_TOL_DIGIT = 9
 
 
 class HeatRange(BaseRange):
-    def __init__(self, start: float, finish: float):
-        super().__init__(start, finish)
-
-    def __repr__(self):
-        return f"HeatRange({self.start}, {self.finish})"
 
     def __contains__(self, temp: float, eps: float = 1e-6) -> bool:
         return self.start - eps <= temp <= self.finish + eps

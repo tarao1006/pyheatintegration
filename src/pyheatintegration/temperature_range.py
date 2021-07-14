@@ -6,11 +6,6 @@ from .base_range import BaseRange
 
 
 class TemperatureRange(BaseRange):
-    def __init__(self, start: float, finish: float):
-        super().__init__(start, finish)
-
-    def __repr__(self) -> str:
-        return f"TemperatureRange({self.start}, {self.finish})"
 
     def merge(self, other: TemperatureRange) -> TemperatureRange:
         """範囲を結合します。
