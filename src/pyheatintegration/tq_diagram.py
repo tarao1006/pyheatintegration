@@ -12,6 +12,72 @@ from .temperature_range import (TemperatureRange, accumulate_heats,
                                 flatten_temperature_ranges, merge_temperature_range)
 
 
+class TQDiagram:
+    """TQ線図を描くために必要な情報を得るためのクラス。
+
+    Args:
+        streams (list[Stream]): 熱交換を行いたい流体。
+        minimum_approach_temp_diff (float): 最小接近温度差[℃]。
+        pinch_point_temp (float): ピンチポイントの温度[℃]。
+
+    Attributes:
+        hot_lines (list[Line]): TQ線図の与熱複合線(プロット用の直線のリスト)。
+        cold_linse (list[Line]): TQ線図の受熱複合線(プロット用の直線のリスト)。
+        hot_lines_separated (list[Line]): 流体ごとに分割した与熱複合線(プロット用の直線のリスト)。
+        cold_lines_separated (list[Line]): 流体ごとに分割した受熱複合線(プロット用の直線のリスト)。
+        hot_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした与熱複合線(プロット用の直線のリスト)。
+        cold_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした受熱複合線(プロット用の直線のリスト)。
+        hot_lines_merged (list[Line]): 熱交換器を結合した与熱複合線(プロット用の直線のリスト)。
+        cold_lines_merged (list[Line]): 熱交換器を結合した受熱複合線(プロット用の直線のリスト)。
+        hcc_merged (list[PlotSegment]): 熱交換器を結合した与熱複合線。
+        ccc_merged (list[PlotSegment]): 熱交換器を結合した受熱複合線。
+    """
+
+    def __init__(
+        self,
+        streams: list[Stream],
+        minimum_approach_temp_diff: float,
+        pinch_point_temp: float
+    ):
+        hot_streams = sorted(
+            [stream for stream in streams if stream.is_hot()],
+            key=lambda stream: stream.output_temperature()
+        )
+
+        cold_streams = sorted(
+            [stream for stream in streams if stream.is_cold()],
+            key=lambda stream: stream.input_temperature()
+        )
+
+        # 与熱複合線と受熱複合線を得た後に、最小接近温度差を満たすようにずらす。
+        hcc, ccc = _shift_curve(
+            _create_composite_curve(hot_streams),
+            _create_composite_curve(cold_streams),
+            minimum_approach_temp_diff,
+            pinch_point_temp
+        )
+
+        # セグメントを得る。
+        segments = _get_segments(hcc, ccc, hot_streams, cold_streams)
+
+        # 最小接近温度差を満たすように分割を行う
+        segments.split(minimum_approach_temp_diff)
+
+        self.hot_lines = segments.hot_lines()
+        self.cold_lines = segments.cold_lines()
+
+        self.hot_lines_separated = segments.hot_lines_separated()
+        self.cold_lines_separated = segments.cold_lines_separated()
+
+        self.hot_lines_splitted = segments.hot_lines_splitted()
+        self.cold_lines_splitted = segments.cold_lines_splitted()
+
+        # 結合可能なセグメント同士を結合する。
+        self.hcc_merged, self.ccc_merged = _merge_segments(segments)
+        self.hot_lines_merged = [plot_segment.line() for plot_segment in self.hcc_merged]
+        self.cold_lines_merged = [plot_segment.line() for plot_segment in self.ccc_merged]
+
+
 def _create_composite_curve(streams: list[Stream]) -> list[PlotSegment]:
     """受け取った流体から生成した複合線を返します。
 
@@ -409,69 +475,3 @@ def get_possible_minimum_temp_diff_range(
         maximum_minimum_approch_temp_diff,
         minimum_minimum_approch_temp_diff
     )
-
-
-class TQDiagram:
-    """TQ線図を描くために必要な情報を得るためのクラス。
-
-    Args:
-        streams (list[Stream]): 熱交換を行いたい流体。
-        minimum_approach_temp_diff (float): 最小接近温度差[℃]。
-        pinch_point_temp (float): ピンチポイントの温度[℃]。
-
-    Attributes:
-        hot_lines (list[Line]): TQ線図の与熱複合線(プロット用の直線のリスト)。
-        cold_linse (list[Line]): TQ線図の受熱複合線(プロット用の直線のリスト)。
-        hot_lines_separated (list[Line]): 流体ごとに分割した与熱複合線(プロット用の直線のリスト)。
-        cold_lines_separated (list[Line]): 流体ごとに分割した受熱複合線(プロット用の直線のリスト)。
-        hot_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした与熱複合線(プロット用の直線のリスト)。
-        cold_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした受熱複合線(プロット用の直線のリスト)。
-        hot_lines_merged (list[Line]): 熱交換器を結合した与熱複合線(プロット用の直線のリスト)。
-        cold_lines_merged (list[Line]): 熱交換器を結合した受熱複合線(プロット用の直線のリスト)。
-        hcc_merged (list[PlotSegment]): 熱交換器を結合した与熱複合線。
-        ccc_merged (list[PlotSegment]): 熱交換器を結合した受熱複合線。
-    """
-
-    def __init__(
-        self,
-        streams: list[Stream],
-        minimum_approach_temp_diff: float,
-        pinch_point_temp: float
-    ):
-        hot_streams = sorted(
-            [stream for stream in streams if stream.is_hot()],
-            key=lambda stream: stream.output_temperature()
-        )
-
-        cold_streams = sorted(
-            [stream for stream in streams if stream.is_cold()],
-            key=lambda stream: stream.input_temperature()
-        )
-
-        # 与熱複合線と受熱複合線を得た後に、最小接近温度差を満たすようにずらす。
-        hcc, ccc = _shift_curve(
-            _create_composite_curve(hot_streams),
-            _create_composite_curve(cold_streams),
-            minimum_approach_temp_diff,
-            pinch_point_temp
-        )
-
-        # セグメントを得る。
-        segments = _get_segments(hcc, ccc, hot_streams, cold_streams)
-
-        # 最小接近温度差を満たすように分割を行う
-        segments.split(minimum_approach_temp_diff)
-
-        self.hot_lines = segments.hot_lines()
-        self.cold_lines = segments.cold_lines()
-
-        self.hot_lines_separated = segments.hot_lines_separated()
-        self.cold_lines_separated = segments.cold_lines_separated()
-
-        self.hot_lines_splitted = segments.hot_lines_splitted()
-        self.cold_lines_splitted = segments.cold_lines_splitted()
-
-        # 結合可能なセグメント同士を結合する。
-        self.hcc_merged, self.ccc_merged = _merge_segments(segments)
-        self.hot_lines_merged = [plot_segment.line() for plot_segment in self.hcc_merged]
-        self.cold_lines_merged = [plot_segment.line() for plot_segment in self.ccc_merged]
