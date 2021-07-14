@@ -3,7 +3,7 @@ from collections.abc import Callable
 from copy import copy, deepcopy
 from typing import Optional
 
-from .heat_range import (REL_TOL_DIGIT, HeatRange, get_detailed_heat_ranges,
+from .heat_range import (REL_TOL_DIGIT, HeatRange, get_merged_heat_ranges,
                          get_heat_ranges, get_heats)
 from .plot_segment import PlotSegment, get_plot_segments, is_continuous
 from .segment import Segment, Segments
@@ -137,7 +137,7 @@ def _get_segments(
     Returns:
         Segments: セグメントのリスト。
     """
-    heat_ranges = get_detailed_heat_ranges(
+    heat_ranges = get_merged_heat_ranges(
         [
             [plot_segment.heat_range for plot_segment in hot_plot_segments],
             [plot_segment.heat_range for plot_segment in cold_plot_segments]
@@ -348,7 +348,7 @@ def get_possible_minimum_temp_diff_range(
         stream for stream in streams if stream.is_internal() and stream.is_cold()
     ])
 
-    initial_heat_ranges = get_detailed_heat_ranges(
+    initial_heat_ranges = get_merged_heat_ranges(
         [
             [plot_segment.heat_range for plot_segment in initial_hcc],
             [plot_segment.heat_range for plot_segment in initial_ccc]
@@ -369,7 +369,7 @@ def get_possible_minimum_temp_diff_range(
             plot_segment.shift_heat(gap)
 
     # ずらした複合線の与熱流体と受熱流体を合わせた熱量領域を得る。
-    heat_ranges = get_detailed_heat_ranges(
+    heat_ranges = get_merged_heat_ranges(
         [
             [plot_segment.heat_range for plot_segment in hcc],
             [plot_segment.heat_range for plot_segment in ccc]

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Iterable, Optional
 
 from .base_range import BaseRange
 
@@ -19,9 +19,9 @@ class HeatRange(BaseRange):
             other (HeatRange): 結合対象。
 
         Returns:
-            HeatRange: 結合した範囲。
+            HeatRange: 結合後の範囲。
 
-        Example:
+        Examples:
             >>> a = HeatRange(0, 10)
             >>> b = HeatRange(10, 20)
             >>> a.merge(b)
@@ -36,6 +36,7 @@ class HeatRange(BaseRange):
         """
         if not self.mergeable(other):
             raise ValueError(
+                f"{repr(self)}と{repr(other)}は結合することができません。"
                 "終了値と結合対象の開始値が同じか、"
                 "開始値と結合対象の終了値が同じである必要があります。"
             )
@@ -68,18 +69,21 @@ def get_heat_ranges(heats_: list[float]) -> list[HeatRange]:
     ]
 
 
-def is_continuous(heat_ranges_: list[HeatRange]) -> Optional[tuple[float, float]]:
-    """範囲が連続であるかを検証します。
+def is_continuous(
+    heat_ranges_: list[HeatRange]
+) -> Optional[tuple[float, float]]:
+    """熱量領域のリストが連続であるかを検証します。
 
     Args:
         heat_ranges_ (list[HeatRange]): 熱量領域のリスト。
 
     Returns:
-        Optional[tuple[float, float]]: 領域が連続であるか。
+        Optional[tuple[float, float]]:
+            熱量領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
+            所の値をタプルで返します。
 
     Examples:
         >>> is_continuous([HeatRange(0, 10), HeatRange(10, 20)])
-        None
         >>> is_continuous([HeatRange(0, 10), HeatRange(15, 20)])
         (10, 15)
         >>> is_continuous([HeatRange(0, 15), HeatRange(10, 20)])
@@ -109,9 +113,9 @@ def get_heats(heat_ranges_: list[HeatRange]) -> list[float]:
     heat_ranges = sorted(heat_ranges_)
     if (values := is_continuous(heat_ranges)) is not None:
         raise ValueError(
-            f'終了値と開始値が異なります。'
-            f'finish: {values[0]}, '
-            f'start: {values[1]}'
+            f'終了値と開始値が異なり、領域が連続でない箇所があります。'
+            f'終了値: {values[0]:.3f} '
+            f'開始値: {values[1]:.3f}'
         )
 
     res: list[float] = []
@@ -123,16 +127,23 @@ def get_heats(heat_ranges_: list[HeatRange]) -> list[float]:
     return res
 
 
-def get_detailed_heat_ranges(
-    heat_ranges_list: list[list[HeatRange]]
+def get_merged_heat_ranges(
+    heat_ranges_list: Iterable[list[HeatRange]]
 ) -> list[HeatRange]:
-    """与熱流体と受熱流体を合わせた熱量領域を返します。
+    """複数の熱量領域のリストを合わせた熱量領域を返します。
 
     Args:
-        plot_segments_list (list[list[PlotSegment]]): 複合線のリスト。
+        plot_segments_list (Iterable[list[PlotSegment]]):
+            熱量領域のリストのイテラブル。
 
     Returns:
-        list[HeatRange]: 熱量領域のリスト。
+        list[HeatRange]: 結合後の熱量領域のリスト。
+
+    Examples:
+        >>> l1 = [HeatRange(0, 10), HeatRange(10, 30)]
+        >>> l2 = [HeatRange(5, 15), HeatRange(15, 40)]
+        >>> get_merged_heat_ranges([l1, l2])
+        [HeatRange(0, 5), HeatRange(5, 10), HeatRange(10, 15), HeatRange(15, 30), HeatRange(30, 40)]
     """
     heats: set[float] = set()
     for heat_ranges in heat_ranges_list:
