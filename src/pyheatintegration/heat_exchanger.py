@@ -1,5 +1,4 @@
 import math
-from typing import Optional
 
 from .enums import StreamState
 from .heat_range import HeatRange
@@ -84,10 +83,8 @@ class HeatExchanger:
         cold_stream_state (StreamState): 受熱流体の状態。
         hot_temperature_range (TemperatureRange): 与熱流体の温度領域。
         cold_temperature_range (TemperatureRange): 受熱流体の温度領域。
-        lmtd_parallel_flow (Optional[float]): 並流の場合の対数平均温度差。
-        lmtd_counterflow (float): 向流の場合の対数平均温度差。
-        area_parallel_flow (Optional[float]): 並流の場合の必要面積 [m2]。
-        area_counterflow (float): 向流の場合の必要面積 [m2]。
+        lmtd (float): 対数平均温度差。
+        area (float): 向流の場合の必要面積 [m2]。
         hot_plot_segment (PlotSegment): 与熱流体のプロットセグメント。
         cold_plot_segment (PlotSegment): 受熱流体のプロットセグメント。
         reboiler_or_reactor (bool): リボイラーもしくは反応器で用いるか。
@@ -97,7 +94,8 @@ class HeatExchanger:
         self,
         heat_range: HeatRange,
         hot_plot_segment: PlotSegment,
-        cold_plot_segment: PlotSegment
+        cold_plot_segment: PlotSegment,
+        counterflow: bool = True
     ):
         self.heat_range = heat_range
         self.hot_plot_segment = hot_plot_segment
@@ -115,15 +113,12 @@ class HeatExchanger:
             self.cold_stream_state
         )
 
-        self.lmtd_parallel_flow = self.init_lmtd_pararell_flow()
-        self.lmtd_counterflow = self.init_lmtd_counterflow()
-
-        if self.lmtd_parallel_flow is not None:
-            self.area_parallel_flow = self.heat_range.delta / self.lmtd_parallel_flow / self.overall_heat_transfer_coefficient
+        if counterflow:
+            self.lmtd = self.init_lmtd_counterflow()
         else:
-            self.area_parallel_flow = None
+            self.lmtd = self.init_lmtd_pararell_flow()
 
-        self.area_counterflow = self.heat_range.delta / self.lmtd_counterflow / self.overall_heat_transfer_coefficient
+        self.area = self.heat_range.delta / self.lmtd / self.overall_heat_transfer_coefficient
 
     def __repr__(self) -> str:
         return (
@@ -144,7 +139,7 @@ class HeatExchanger:
     def __lt__(self, other) -> bool:
         return self.heat_range < other.heat_range
 
-    def init_lmtd_pararell_flow(self) -> Optional[float]:
+    def init_lmtd_pararell_flow(self) -> float:
         """並流の場合の対数平均温度差を返します。
 
         並流が不可能な場合はNoneを返します。
@@ -159,7 +154,10 @@ class HeatExchanger:
         finish_temp_diff = hot_low_temp - cold_high_temp
 
         if finish_temp_diff <= 0:
-            return None
+            raise RuntimeError(
+                '出口温度差が0以下となるため、並流にすることができません。'
+                f'出口温度差: {finish_temp_diff} ℃'
+            )
 
         if start_temp_diff == finish_temp_diff:
             return start_temp_diff

@@ -130,7 +130,7 @@ class PinchAnalyzer:
 
         self.heat_exchanger_cost = sum(
             calculate_heat_exchanger_cost(
-                heat_exchanger.area_counterflow,
+                heat_exchanger.area,
                 heat_exchanger.reboiler_or_reactor
             )
             for heat_exchanger in self.heat_exchangers
