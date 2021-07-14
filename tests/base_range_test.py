@@ -1,6 +1,7 @@
 import unittest
 
-from src.pyheatintegration.base_range import BaseRange, minmax, merge, is_continuous, flatten, get_ranges
+from src.pyheatintegration.base_range import (BaseRange, flatten, get_ranges,
+                                              is_continuous, merge, minmax)
 
 
 class TestMinMax(unittest.TestCase):

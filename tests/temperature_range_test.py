@@ -1,8 +1,7 @@
 import unittest
 
 from src.pyheatintegration.temperature_range import (
-    TemperatureRange, accumulate_heats,
-    get_temperature_transition)
+    TemperatureRange, accumulate_heats, get_temperature_transition)
 
 
 class TestTemperatureRange(unittest.TestCase):
