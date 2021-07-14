@@ -132,6 +132,42 @@ class BaseRange(ABC):
 T = TypeVar('T', bound=BaseRange)
 
 
+def merge(
+    range_: T,
+    other: T
+) -> T:
+    """範囲を結合します。
+
+    Args:
+        range_ (T): 結合元。
+        other (T): 結合対象。
+
+    Returns:
+        T: 結合後の範囲。
+
+    Raises:
+        TypeError: 結合元と結合対象の型が一致しない場合。
+        ValueError: 結合可能ではない範囲が渡された場合。
+    """
+    if type(range_) != type(other):
+        raise TypeError(
+            f'{repr(range_)}と{repr(other)}は型が異なるため、結合することができません。'
+        )
+
+    if not range_.mergeable(other):
+        raise ValueError(
+            f"{repr(range_)}と{repr(other)}は結合することができません。"
+            "終了値と結合対象の開始値が同じか、"
+            "開始値と結合対象の終了値が同じである必要があります。"
+        )
+
+    cls = type(range_)
+
+    if range_.start == other.finish:
+        return cls(other.start, range_.finish)
+    return cls(range_.start, other.finish)
+
+
 def is_continuous(
     ranges_: list[T]
 ) -> Optional[tuple[float, float]]:

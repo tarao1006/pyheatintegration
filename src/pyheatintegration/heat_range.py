@@ -2,51 +2,27 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from .base_range import BaseRange, flatten, get_ranges
+from .base_range import BaseRange, flatten, get_ranges, merge
 
 REL_TOL_DIGIT = 9
 
 
 class HeatRange(BaseRange):
+    """熱量範囲を表すクラス。
+    """
 
     def __contains__(self, temp: float, eps: float = 1e-6) -> bool:
         return self.start - eps <= temp <= self.finish + eps
 
-    def merge(self, other: HeatRange) -> HeatRange:
-        """範囲を結合します。
-
-        Args:
-            other (HeatRange): 結合対象。
-
-        Returns:
-            HeatRange: 結合後の範囲。
-
-        Examples:
-            >>> a = HeatRange(0, 10)
-            >>> b = HeatRange(10, 20)
-            >>> a.merge(b)
-            HeatRange(0, 20)
-            >>> a = HeatRange(10, 20)
-            >>> b = HeatRange(0, 10)
-            >>> a.merge(b)
-            HeatRange(0, 20)
-
-        Raises:
-            ValueError: 結合可能ではない範囲が渡された場合。
-        """
-        if not self.mergeable(other):
-            raise ValueError(
-                f"{repr(self)}と{repr(other)}は結合することができません。"
-                "終了値と結合対象の開始値が同じか、"
-                "開始値と結合対象の終了値が同じである必要があります。"
-            )
-
-        if self.start == other.finish:
-            return HeatRange(other.start, self.finish)
-        return HeatRange(self.start, other.finish)
-
 
 BaseRange.register(HeatRange)
+
+
+def merge_heat_range(
+    range_: HeatRange,
+    other: HeatRange
+) -> HeatRange:
+    return merge(range_, other)
 
 
 def get_heat_ranges(heats: list[float]) -> list[HeatRange]:

@@ -4,12 +4,12 @@ from copy import copy, deepcopy
 from typing import Optional
 
 from .heat_range import (REL_TOL_DIGIT, HeatRange, flatten_heat_ranges,
-                         get_heat_ranges, get_merged_heat_ranges)
+                         get_heat_ranges, get_merged_heat_ranges, merge_heat_range)
 from .plot_segment import PlotSegment, get_plot_segments, is_continuous
 from .segment import Segment, Segments
 from .stream import Stream, get_temperature_range_heats
 from .temperature_range import (TemperatureRange, accumulate_heats,
-                                flatten_temperature_ranges)
+                                flatten_temperature_ranges, merge_temperature_range)
 
 
 def _create_composite_curve(streams: list[Stream]) -> list[PlotSegment]:
@@ -261,9 +261,9 @@ def _merge_segments(
 
         if hot_plot_segment.mergiable(next_hot_plot_segment) \
            and cold_plot_segment.mergiable(next_cold_plot_segment):
-            merged_heat_range = hot_plot_segment.heat_range.merge(next_hot_plot_segment.heat_range)
-            merged_hot_temp_range = hot_plot_segment.temperature_range.merge(next_hot_plot_segment.temperature_range)
-            merged_cold_temp_range = cold_plot_segment.temperature_range.merge(next_cold_plot_segment.temperature_range)
+            merged_heat_range = merge_heat_range(hot_plot_segment.heat_range, next_hot_plot_segment.heat_range)
+            merged_hot_temp_range = merge_temperature_range(hot_plot_segment.temperature_range, next_hot_plot_segment.temperature_range)
+            merged_cold_temp_range = merge_temperature_range(cold_plot_segment.temperature_range, next_cold_plot_segment.temperature_range)
             merged_hot_plot_segments.append(PlotSegment(
                 *merged_heat_range(),
                 *merged_hot_temp_range(),

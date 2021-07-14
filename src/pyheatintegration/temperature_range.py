@@ -1,45 +1,21 @@
 from __future__ import annotations
 
-from .base_range import BaseRange, flatten, get_ranges
+from .base_range import BaseRange, flatten, get_ranges, merge
 
 
 class TemperatureRange(BaseRange):
-
-    def merge(self, other: TemperatureRange) -> TemperatureRange:
-        """範囲を結合します。
-
-        Args:
-            other (TemperatureRange): 結合対象。
-
-        Returns:
-            TemperatureRange: 結合後の範囲。
-
-        Examples:
-            >>> a = TemperatureRange(0, 10)
-            >>> b = TemperatureRange(10, 20)
-            >>> a.merge(b)
-            TemperatureRange(0, 20)
-            >>> a = TemperatureRange(10, 20)
-            >>> b = TemperatureRange(0, 10)
-            >>> a.merge(b)
-            TemperatureRange(0, 20)
-
-        Raises:
-            ValueError: 結合可能ではない範囲が渡された場合。
-        """
-        if not self.mergeable(other):
-            raise ValueError(
-                f"{repr(self)}と{repr(other)}は結合することができません。"
-                "終了値と結合対象の開始値が同じか、"
-                "開始値と結合対象の終了値が同じである必要があります。"
-            )
-
-        if self.start == other.finish:
-            return TemperatureRange(other.start, self.finish)
-        return TemperatureRange(self.start, other.finish)
+    """温度範囲を表すクラス。
+    """
 
 
 BaseRange.register(TemperatureRange)
+
+
+def merge_temperature_range(
+    range_: TemperatureRange,
+    other: TemperatureRange
+) -> TemperatureRange:
+    return merge(range_, other)
 
 
 def get_temperature_ranges(temperatures: list[float]) -> list[TemperatureRange]:
