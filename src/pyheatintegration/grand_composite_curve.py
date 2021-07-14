@@ -64,8 +64,6 @@ class GrandCompositeCurve:
         minimum_pinch_point_index (int): 最も温度が低いピンチポイントのインデックス。
         temps (list[float]): 温度のリスト[℃]。
         heats (list[float]): 熱量のリスト[W]。
-        hot_utility_target (float): 必要加熱量[W]。
-        cold_utility_target (float): 必要冷却熱量[W]。
     """
 
     def __init__(
@@ -98,9 +96,6 @@ class GrandCompositeCurve:
         self.maximum_pinch_point_index = pinch_point_info[1]
         self.minimum_pinch_point_temp = pinch_point_info[2]
         self.minimum_pinch_point_index = pinch_point_info[3]
-
-        self.hot_utility_target = self.heats[-1]
-        self.cold_utility_target = self.heats[0]
 
     def _get_pinch_point(self) -> tuple[float, int, float, int]:
         """ピンチポイントとピンチポイントのインデックスを求めます。
