@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .base_range import BaseRange, is_continuous
+from .base_range import BaseRange
 
 
 class TemperatureRange(BaseRange):
@@ -40,71 +40,6 @@ class TemperatureRange(BaseRange):
 
 
 BaseRange.register(TemperatureRange)
-
-
-# def is_continuous(
-#     temp_ranges_: list[TemperatureRange]
-# ) -> Optional[tuple[float, float]]:
-#     """温度領域のリストが連続であるかを検証します。
-
-#     Args:
-#         heat_ranges_ (list[TemperatureRange]): 温度領域のリスト。
-
-#     Returns:
-#         Optional[tuple[float, float]]:
-#             温度領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
-#             所の値をタプルで返します。
-
-#     Examples:
-#         >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(10, 20)])
-#         >>> is_continuous([TemperatureRange(0, 10), TemperatureRange(15, 20)])
-#         (10, 15)
-#         >>> is_continuous([TemperatureRange(0, 15), TemperatureRange(10, 20)])
-#         (15, 10)
-#     """
-#     temp_ranges = sorted(temp_ranges_)
-#     for i in range(len(temp_ranges)):
-#         if i != len(temp_ranges) - 1:
-#             if temp_ranges[i].finish != temp_ranges[i + 1].start:
-#                 return temp_ranges[i].finish, temp_ranges[i + 1].start
-#     return None
-
-
-def get_temperatures(temp_ranges_: list[TemperatureRange]) -> list[float]:
-    """温度のリストを返します。
-
-    Args:
-        heat_ranges_ (list[TemperatureRange]): 温度領域のリスト。
-
-    Returns:
-        list[float]: 温度のリスト。
-
-    Raises:
-        ValueError: 温度領域が連続でない場合。
-
-    Examples:
-        >>> get_temperatures([TemperatureRange(0, 10), TemperatureRange(10, 20)])
-        [0, 10, 20]
-        >>> get_temperatures([TemperatureRange(0, 10), TemperatureRange(30, 40)])
-        Traceback (most recent call last):
-        ...
-        ValueError: 終了値と開始値が異なります。終了値: 10.000 開始値: 30.000
-    """
-    temp_ranges = sorted(temp_ranges_)
-    if (values := is_continuous(temp_ranges)) is not None:
-        raise ValueError(
-            f'終了値と開始値が異なります。'
-            f'終了値: {values[0]:.3f} '
-            f'開始値: {values[1]:.3f}'
-        )
-
-    res: list[float] = []
-    for i in range(len(temp_ranges)):
-        res.append(temp_ranges[i].start)
-        if i == len(temp_ranges) - 1:
-            res.append(temp_ranges[i].finish)
-
-    return res
 
 
 def get_temperature_ranges(temperatures_: list[float]) -> list[TemperatureRange]:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from .base_range import BaseRange, is_continuous
+from .base_range import BaseRange, flatten
 
 REL_TOL_DIGIT = 9
 
@@ -69,64 +69,6 @@ def get_heat_ranges(heats_: list[float]) -> list[HeatRange]:
     ]
 
 
-# def is_continuous(
-#     heat_ranges_: list[HeatRange]
-# ) -> Optional[tuple[float, float]]:
-#     """熱量領域のリストが連続であるかを検証します。
-
-#     Args:
-#         heat_ranges_ (list[HeatRange]): 熱量領域のリスト。
-
-#     Returns:
-#         Optional[tuple[float, float]]:
-#             熱量領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
-#             所の値をタプルで返します。
-
-#     Examples:
-#         >>> is_continuous([HeatRange(0, 10), HeatRange(10, 20)])
-#         >>> is_continuous([HeatRange(0, 10), HeatRange(15, 20)])
-#         (10, 15)
-#         >>> is_continuous([HeatRange(0, 15), HeatRange(10, 20)])
-#         (15, 10)
-#     """
-#     heat_ranges = sorted(heat_ranges_)
-#     for i in range(len(heat_ranges)):
-#         if i != len(heat_ranges) - 1:
-#             if heat_ranges[i].finish != heat_ranges[i + 1].start:
-#                 return heat_ranges[i].finish, heat_ranges[i + 1].start
-#     return None
-
-
-def get_heats(heat_ranges_: list[HeatRange]) -> list[float]:
-    """熱量のリストを返します。
-
-    Args:
-        heat_ranges_ (list[HeatRange]): 熱量領域のリスト。
-
-    Returns:
-        list[float]: 熱量のリスト。
-
-    Examples:
-        >>> get_heats([HeatRange(0, 10), HeatRange(10, 20)])
-        [0, 10, 20]
-    """
-    heat_ranges = sorted(heat_ranges_)
-    if (values := is_continuous(heat_ranges)) is not None:
-        raise ValueError(
-            f'終了値と開始値が異なり、領域が連続でない箇所があります。'
-            f'終了値: {values[0]:.3f} '
-            f'開始値: {values[1]:.3f}'
-        )
-
-    res: list[float] = []
-    for i in range(len(heat_ranges)):
-        res.append(heat_ranges[i].start)
-        if i == len(heat_ranges) - 1:
-            res.append(heat_ranges[i].finish)
-
-    return res
-
-
 def get_merged_heat_ranges(
     heat_ranges_list: Iterable[list[HeatRange]]
 ) -> list[HeatRange]:
@@ -147,6 +89,6 @@ def get_merged_heat_ranges(
     """
     heats: set[float] = set()
     for heat_ranges in heat_ranges_list:
-        heats |= set(get_heats(heat_ranges))
+        heats |= set(flatten(heat_ranges))
 
     return get_heat_ranges(sorted(list(heats)))
