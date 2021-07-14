@@ -135,22 +135,15 @@ T = TypeVar('T', bound=BaseRange)
 def is_continuous(
     ranges_: list[T]
 ) -> Optional[tuple[float, float]]:
-    """温度領域のリストが連続であるかを検証します。
+    """領域のリストが連続であるかを検証します。
 
     Args:
-        heat_ranges_ (list[T]): 温度領域のリスト。
+        ranges_ (list[T]): 領域のリスト。
 
     Returns:
         Optional[tuple[float, float]]:
-            温度領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇
-            所の値をタプルで返します。
-
-    Examples:
-        >>> is_continuous([T(0, 10), T(10, 20)])
-        >>> is_continuous([T(0, 10), T(15, 20)])
-        (10, 15)
-        >>> is_continuous([T(0, 15), T(10, 20)])
-        (15, 10)
+            領域が連続である場合はNoneを返し、連続でない場合は、連続でないと判断された箇所の
+            値をタプルで返します。
     """
     ranges = sorted(ranges_)
     for i in range(len(ranges)):
@@ -171,14 +164,6 @@ def flatten(ranges_: list[T]) -> list[float]:
 
     Raises:
         ValueError: 領域が連続でない場合。
-
-    Examples:
-        >>> get_temperatures([T(0, 10), T(10, 20)])
-        [0, 10, 20]
-        >>> get_temperatures([T(0, 10), T(30, 40)])
-        Traceback (most recent call last):
-        ...
-        ValueError: 終了値と開始値が異なります。終了値: 10.000 開始値: 30.000
     """
     ranges = sorted(ranges_)
     if (values := is_continuous(ranges)) is not None:
@@ -197,21 +182,18 @@ def flatten(ranges_: list[T]) -> list[float]:
     return res
 
 
-def get_ranges(values: list[float]) -> list[T]:
+def get_ranges(
+    values: list[float],
+    cls: type[T]
+) -> list[T]:
     """領域のリストを返します。
 
     Args:
-        temperatures_ (list[float]): 温度のリスト。
+        values (list[float]): 領域の開始値と終了値を構成する値のリスト。
+        cls (type[T]): 領域のクラス。HeatRange/TemperatureRange
 
     Returns:
-        list[T]: 温度領域のリスト。
-
-    Examples:
-        >>> get_temperature_ranges([0, 10, 20])
-        [T(0, 10), T(10, 20)]
+        list[T]: 領域のリスト。
     """
     values = sorted(values)
-    return [
-        T(values[i], values[i + 1])
-        for i in range(len(values) - 1)
-    ]
+    return [cls(values[i], values[i + 1]) for i in range(len(values) - 1)]

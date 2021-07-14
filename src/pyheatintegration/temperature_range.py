@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .base_range import BaseRange
+from .base_range import BaseRange, get_ranges
 
 
 class TemperatureRange(BaseRange):
@@ -56,10 +56,7 @@ def get_temperature_ranges(temperatures_: list[float]) -> list[TemperatureRange]
         [TemperatureRange(0, 10), TemperatureRange(10, 20)]
     """
     temperatures = sorted(temperatures_)
-    return [
-        TemperatureRange(temperatures[i], temperatures[i + 1])
-        for i in range(len(temperatures) - 1)
-    ]
+    return get_ranges(temperatures, TemperatureRange)
 
 
 def get_temperature_transition(

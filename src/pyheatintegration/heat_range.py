@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from .base_range import BaseRange, flatten
+from .base_range import BaseRange, flatten, get_ranges
 
 REL_TOL_DIGIT = 9
 
@@ -49,7 +49,7 @@ class HeatRange(BaseRange):
 BaseRange.register(HeatRange)
 
 
-def get_heat_ranges(heats_: list[float]) -> list[HeatRange]:
+def get_heat_ranges(heats: list[float]) -> list[HeatRange]:
     """熱量領域のリストを返します。
 
     Args:
@@ -62,11 +62,7 @@ def get_heat_ranges(heats_: list[float]) -> list[HeatRange]:
         >>> get_heat_ranges([0, 10, 20])
         [HeatRange(0, 10), HeatRange(10, 20)]
     """
-    heats = sorted(heats_)
-    return [
-        HeatRange(heats[i], heats[i + 1])
-        for i in range(len(heats) - 1)
-    ]
+    return get_ranges(heats, HeatRange)
 
 
 def get_merged_heat_ranges(
