@@ -26,6 +26,18 @@ class BaseRange(ABC):
         self.start, self.finish = minmax(start, finish)
         self.delta = self.finish - self.start
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.start}, {self.finish})"
+
+    def __str__(self) -> str:
+        return f"{self.start}->{self.finish}"
+
+    def __format__(self, format_spec: str) -> str:
+        return (
+            f"{self.start.__format__(format_spec)}->"
+            f"{self.finish.__format__(format_spec)}"
+        )
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, BaseRange):
             return NotImplemented
@@ -59,18 +71,6 @@ class BaseRange(ABC):
     def __hash__(self) -> int:
         return hash((self.start, self.finish))
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.start}, {self.finish})"
-
-    def __str__(self) -> str:
-        return f"{self.start}->{self.finish}"
-
-    def __format__(self, format_spec: str) -> str:
-        return (
-            f"{self.start.__format__(format_spec)}->"
-            f"{self.finish.__format__(format_spec)}"
-        )
-
     def __call__(self) -> tuple[float, float]:
         return self.start, self.finish
 
@@ -81,15 +81,30 @@ class BaseRange(ABC):
             value (float): 範囲内にあるかを検証したい値。
 
         Returns:
-            bool: 範囲内にあるかどうか。
+            bool: 範囲内にある場合はTrue、ない場合はFalseを返します。
+
+        Examples:
+            >>> base_range = BaseRange(0, 10)
+            >>> 10 in base_range
+            True
+            >>> 11 in base_range
+            False
         """
         return self.start <= value <= self.finish
 
     def shift(self, delta: float) -> None:
-        """範囲をずらす。
+        """範囲をずらします。
 
         Args:
-            delta (float): ずらす値
+            delta (float): ずらす値。
+
+        Examples:
+            >>> base_range = BaseRange(0, 10)
+            >>> base_range.shift(10)
+            >>> base_range.start
+            10
+            >>> base_range.finish
+            20
         """
         self.start += delta
         self.finish += delta
@@ -101,6 +116,13 @@ class BaseRange(ABC):
             other (BaseRange): 結合対象。
 
         Returns:
-            bool: 結合可能かどうか。
+            結合可能であるかどうかを表すbool値。
+
+        Examples:
+            >>> base_range = BaseRange(0, 10)
+            >>> base_range.mergeable(BaseRange(10, 20))
+            True
+            >>> base_range.mergeable(BaseRange(5, 20))
+            False
         """
         return self.start == other.finish or self.finish == other.start
