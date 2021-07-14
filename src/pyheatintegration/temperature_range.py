@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .base_range import BaseRange, get_ranges
+from .base_range import BaseRange, flatten, get_ranges
 
 
 class TemperatureRange(BaseRange):
@@ -42,21 +42,12 @@ class TemperatureRange(BaseRange):
 BaseRange.register(TemperatureRange)
 
 
-def get_temperature_ranges(temperatures_: list[float]) -> list[TemperatureRange]:
-    """温度領域のリストを返します。
-
-    Args:
-        temperatures_ (list[float]): 温度のリスト。
-
-    Returns:
-        list[HeatRange]: 温度領域のリスト。
-
-    Examples:
-        >>> get_temperature_ranges([0, 10, 20])
-        [TemperatureRange(0, 10), TemperatureRange(10, 20)]
-    """
-    temperatures = sorted(temperatures_)
+def get_temperature_ranges(temperatures: list[float]) -> list[TemperatureRange]:
     return get_ranges(temperatures, TemperatureRange)
+
+
+def flatten_temperature_ranges(temperature_ranges: list[TemperatureRange]) -> list[float]:
+    return flatten(temperature_ranges)
 
 
 def get_temperature_transition(

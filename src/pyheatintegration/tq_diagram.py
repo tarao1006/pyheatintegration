@@ -3,13 +3,13 @@ from collections.abc import Callable
 from copy import copy, deepcopy
 from typing import Optional
 
-from .base_range import flatten
-from .heat_range import (REL_TOL_DIGIT, HeatRange, get_merged_heat_ranges,
-                         get_heat_ranges)
+from .heat_range import (REL_TOL_DIGIT, HeatRange, flatten_heat_ranges,
+                         get_heat_ranges, get_merged_heat_ranges)
 from .plot_segment import PlotSegment, get_plot_segments, is_continuous
 from .segment import Segment, Segments
 from .stream import Stream, get_temperature_range_heats
-from .temperature_range import TemperatureRange, accumulate_heats
+from .temperature_range import (TemperatureRange, accumulate_heats,
+                                flatten_temperature_ranges)
 
 
 def _create_composite_curve(streams: list[Stream]) -> list[PlotSegment]:
@@ -22,7 +22,7 @@ def _create_composite_curve(streams: list[Stream]) -> list[PlotSegment]:
         list[PlotSegment]: 複合線。
     """
     t_ranges, t_range_heats = get_temperature_range_heats(streams)
-    t = flatten(t_ranges)
+    t = flatten_temperature_ranges(t_ranges)
     h = accumulate_heats(t_ranges, t_range_heats)
     return [
         PlotSegment(h[i], h[i + 1], t[i], t[i + 1]) for i in range(len(h) - 1)
@@ -231,7 +231,7 @@ def _merge_segments(
         plot_segment for segment in segments for plot_segment in segment.cold_plot_segments_splitted
     ])
     heat_ranges = get_heat_ranges(
-        flatten(
+        flatten_heat_ranges(
             sorted([
                 heat_range for segment in segments for heat_range in segment.heat_ranges
             ])

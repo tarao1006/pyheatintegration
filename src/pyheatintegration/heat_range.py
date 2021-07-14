@@ -50,19 +50,11 @@ BaseRange.register(HeatRange)
 
 
 def get_heat_ranges(heats: list[float]) -> list[HeatRange]:
-    """熱量領域のリストを返します。
-
-    Args:
-        heats_ (list[float]): 熱量のリスト。
-
-    Returns:
-        list[HeatRange]: 熱量領域のリスト。
-
-    Examples:
-        >>> get_heat_ranges([0, 10, 20])
-        [HeatRange(0, 10), HeatRange(10, 20)]
-    """
     return get_ranges(heats, HeatRange)
+
+
+def flatten_heat_ranges(heat_ranges: list[HeatRange]) -> list[float]:
+    return flatten(heat_ranges)
 
 
 def get_merged_heat_ranges(
@@ -85,6 +77,6 @@ def get_merged_heat_ranges(
     """
     heats: set[float] = set()
     for heat_ranges in heat_ranges_list:
-        heats |= set(flatten(heat_ranges))
+        heats |= set(flatten_heat_ranges(heat_ranges))
 
     return get_heat_ranges(sorted(list(heats)))

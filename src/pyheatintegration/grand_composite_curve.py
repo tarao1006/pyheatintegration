@@ -2,8 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 from .stream import Stream, get_temperature_range_streams
-from .temperature_range import TemperatureRange
-from .base_range import flatten
+from .temperature_range import TemperatureRange, flatten_temperature_ranges
 
 
 def _get_heats(
@@ -89,7 +88,7 @@ class GrandCompositeCurve:
         temp_ranges, temp_range_streams = get_temperature_range_streams([
             stream for stream in streams if stream.is_internal()
         ])
-        self.temps = flatten(temp_ranges)
+        self.temps = flatten_temperature_ranges(temp_ranges)
         self.heats = _get_heats(temp_ranges, temp_range_streams)
 
         pinch_point_info = self._get_pinch_point()
