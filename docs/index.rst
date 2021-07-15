@@ -1,7 +1,7 @@
 pyheatintegration reference documentation
 =========================================
 
-pyheatintegrationは `プロセス設計`_ で必要なヒートインテグレーションを支援するパッケージで
+pyheatintegrationは `プロセス設計`_ で必要なヒートインテグレーションを支援するパッケージで\
 す。グランドコンポジットカーブの作成、TQ線図の作成、必要な熱交換器数の導出を行うことができます。
 
 Installation
