@@ -18,13 +18,8 @@ def y_range(lines: list[Line]) -> tuple[float, float]:
             最小値と最大値。
 
     Examples:
-        >>> y_range([
-                ((0, 0), (1, 1)),
-                ((1, 1), (2, 2)),
-                ((2, 2), (3, 5)),
-                ((3, 3), (5, 8))
-            ])
-        >>> (0, 8)
+        >>> y_range([((0, 0), (1, 1)), ((1, 1), (2, 2)), ((2, 2), (3, 5)), ((3, 3), (5, 8))])
+        (0, 8)
     """
     return (
         min(line[0][1] for line in lines),
@@ -42,12 +37,7 @@ def extract_x(lines: list[Line]) -> list[float]:
         list[float]: x座標の値。
 
     Examples:
-        >>> extract_x([
-                ((0, 0), (1, 1)),
-                ((1, 1), (2, 2)),
-                ((2, 2), (3, 5)),
-                ((3, 3), (5, 8))
-            ])
-        >>> [0, 1, 2, 3, 5]
+        >>> extract_x([((0, 0), (1, 1)), ((1, 1), (2, 2)), ((2, 2), (3, 5)), ((3, 3), (5, 8))])
+        [0, 1, 2, 3, 5]
     """
     return sorted(list(set(point[0] for point in chain(*lines))))
