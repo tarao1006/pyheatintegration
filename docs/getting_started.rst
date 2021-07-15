@@ -11,3 +11,4 @@ Getting Started
   create_stream
   analysis
   draw_graph
+  excel
