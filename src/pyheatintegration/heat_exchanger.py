@@ -84,7 +84,6 @@ class HeatExchanger:
         hot_temperature_range (TemperatureRange): 与熱流体の温度領域。
         cold_temperature_range (TemperatureRange): 受熱流体の温度領域。
         lmtd (float): 対数平均温度差。
-        area (float): 向流の場合の必要面積 [m2]。
         hot_plot_segment (PlotSegment): 与熱流体のプロットセグメント。
         cold_plot_segment (PlotSegment): 受熱流体のプロットセグメント。
         reboiler_or_reactor (bool): リボイラーもしくは反応器で用いるか。
@@ -108,17 +107,10 @@ class HeatExchanger:
         self.cold_stream_state = self.cold_plot_segment.state
         self.reboiler_or_reactor = self.hot_plot_segment.reboiler_or_reactor | self.cold_plot_segment.reboiler_or_reactor
 
-        self.overall_heat_transfer_coefficient = get_overall_heat_transfer_coefficient(
-            self.hot_stream_state,
-            self.cold_stream_state
-        )
-
         if counterflow:
             self.lmtd = self.init_lmtd_counterflow()
         else:
             self.lmtd = self.init_lmtd_pararell_flow()
-
-        self.area = self.heat_range.delta / self.lmtd / self.overall_heat_transfer_coefficient
 
     def __repr__(self) -> str:
         return (
@@ -180,6 +172,18 @@ class HeatExchanger:
             return start_temp_diff
 
         return (start_temp_diff - finish_temp_diff) / math.log(start_temp_diff / finish_temp_diff)
+
+    def get_area(self, ignore_unknown: bool = True) -> float:
+        try:
+            overall_heat_transfer_coefficient = get_overall_heat_transfer_coefficient(
+                self.hot_stream_state,
+                self.cold_stream_state
+            )
+            return self.heat_range.delta / self.lmtd / overall_heat_transfer_coefficient
+        except Exception as e:
+            if ignore_unknown:
+                return 1.0
+            raise e
 
 
 def merge_heat_exchangers(heat_exchanger: HeatExchanger, other: HeatExchanger) -> HeatExchanger:
