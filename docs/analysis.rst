@@ -57,7 +57,7 @@ Step2. Analysis
 
 ``PinchAnalyzer`` のインスタンス生成時に、グランドコンポジットカーブおよびTQ線図の描画に必要\
 な計算が行われます。計算した結果は以下の ``create_*`` を呼ぶことで得ることができます。実際の\
-グラフ描画については :doc:`draw_diagram` を参照して下さい。
+グラフ描画については :doc:`draw_graph` を参照して下さい。
 
 * ``create_grand_composite_curve``: グランドコンポジットカーブ
 * ``create_tq``: TQ線図

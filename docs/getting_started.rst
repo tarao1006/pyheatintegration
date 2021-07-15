@@ -6,4 +6,4 @@ Getting Started
 
   create_stream
   analysis
-  draw_diagram
+  draw_graph

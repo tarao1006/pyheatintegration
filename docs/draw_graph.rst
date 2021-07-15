@@ -1,5 +1,5 @@
-Step3. Draw Diagram
-===================
+Step3. Draw Graph
+=================
 
 .. code-block:: python
 
