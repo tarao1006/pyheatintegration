@@ -49,7 +49,6 @@ class PinchAnalyzer:
         minimum_approach_temp_diff_range (TemperatureRange): 最小接近温度差の指定可能範囲。
         pinch_point_temp (float): ピンチポイントの温度 [℃]。
         heat_exchangers (list[HeatExchanger]): 熱交換器のリスト。
-        heat_exchanger_cost (float): 熱交換器のコスト。
         external_heating_demand (float): 必要加熱量[W]。
         external_cooling_demand (float): 必要冷却熱量[W]。
 
@@ -134,14 +133,6 @@ class PinchAnalyzer:
                 HeatExchanger(heat_range, hot_plot_segment, cold_plot_segment)
             )
 
-        self.heat_exchanger_cost = sum(
-            calculate_heat_exchanger_cost(
-                heat_exchanger.area,
-                heat_exchanger.reboiler_or_reactor
-            )
-            for heat_exchanger in self.heat_exchangers
-        )
-
     def create_grand_composite_curve(self) -> tuple[list[float], list[float]]:
         """グランドコンポジットカーブを描くために必要な熱量と温度を返します。
         """
@@ -177,4 +168,12 @@ class PinchAnalyzer:
         return (
             self.tq.hot_lines_merged,
             self.tq.cold_lines_merged
+        )
+
+    def get_heat_exchanger_cost(self, ignore_unknown: bool = True) -> float:
+        return sum(
+            calculate_heat_exchanger_cost(
+                heat_exchanger.get_area(ignore_unknown),
+                heat_exchanger.reboiler_or_reactor
+            ) for heat_exchanger in self.heat_exchangers
         )
