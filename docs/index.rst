@@ -76,6 +76,7 @@ Quick Start
   :caption: Getting Started
 
   getting_started
+  heat_exchanger_cost
 
 .. toctree::
   :maxdepth: 2
