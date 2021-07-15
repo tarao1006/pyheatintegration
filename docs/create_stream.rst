@@ -1,7 +1,7 @@
 Step1. Create Stream
 ====================
 
-熱交換を行いたい流体の情報を元に、 ``Stream`` のリストを生成します。 ``Stream`` のコンスト
+熱交換を行いたい流体の情報を元に、 ``Stream`` のリストを生成します。 ``Stream`` のコンスト\
 ラクタは、以下のようになっています。
 
 .. py:class:: Stream(input_temperature: float, output_temperature: float, heat_flow: float, type_: StreamType = <StreamType.AUTO: 5>, state: StreamState = <StreamState.UNKNOWN: 5>, cost: float = 0.0, reboiler_or_reactor: bool = False, id_: str = '')
@@ -26,7 +26,7 @@ Step1. Create Stream
   * ``StreamState.UNKNOWN``: 不明/指定しない。
 
 * ``cost (float)``: コスト [円/J] (外部流体の場合)
-* ``reboiler_or_reactor (bool, optional)``: リボイラーまたは反応器の熱交換に用いられる
+* ``reboiler_or_reactor (bool, optional)``: リボイラーまたは反応器の熱交換に用いられる\
   か。熱交換器のコストを計算する際の係数を決定するために必要な情報。
 * ``id_ (str, optional)``: ID
 
@@ -45,15 +45,15 @@ Step1. Create Stream
 ------------------------
 
 受熱流体は ``input_temperature ≤ output_temperature`` 、与熱流体は
-``input_temperature ≥ output_temperature`` である必要があります。等温流体の設定も可能で
+``input_temperature ≥ output_temperature`` である必要があります。等温流体の設定も可能で\
 す。外部流体の熱量は、グランドコンポジットカーブ作成時に決定するため、流体作成時には
 ``heat_flow = 0`` を指定してください。
 
 流体の種類
 -----------
 
-流体の種類 ``type_`` は ``enum`` 型である ``StreamType`` を用いて指定します。指定可能な種
-類は、 *受熱* 、*与熱* 、*外部受熱* 、*外部与熱* の4種類です。また、自動で種類を判断するよう
+流体の種類 ``type_`` は ``enum`` 型である ``StreamType`` を用いて指定します。指定可能な種\
+類は、 *受熱* 、*与熱* 、*外部受熱* 、*外部与熱* の4種類です。また、自動で種類を判断するよう\
 に指定する *自動* もありますが、明示的に指定する機会はないと思われます。
 
 * ``StreamType.COLD (= 1)``: 受熱
@@ -78,7 +78,7 @@ Step1. Create Stream
   # 入り口温度: 125 度 出口温度 80 度 の外部与熱流体
   Stream(150.0, 150.0, 0.0, StreamType(4))
 
-ただし、外部流体でない場合、入り口温度と出口温度の関係から流体の種類を推測することができるため、
+ただし、外部流体でない場合、入り口温度と出口温度の関係から流体の種類を推測することができるため、\
 省略することができます。一方、外部流体は必ず指定する必要があります。
 
 .. code-block:: python
@@ -94,7 +94,7 @@ Step1. Create Stream
 流体の状態
 ------------
 
-流体の状態 ``state`` は ``enum`` 型である ``StreamState`` を用いて指定します。この値を用
+流体の状態 ``state`` は ``enum`` 型である ``StreamState`` を用いて指定します。この値を用\
 いて総括伝熱係数の値を指定します。
 
 * ``StreamState.GAS (= 1)``: ガス
@@ -140,5 +140,5 @@ Step1. Create Stream
 ID
 ---
 
-``id_`` は流体を区別するために指定します。複数の流体を作成する場合には、idを重複しないようにす
+``id_`` は流体を区別するために指定します。複数の流体を作成する場合には、idを重複しないようにす\
 る必要があります。
