@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib.collections import LineCollection
 
 from pyheatintegration import (PinchAnalyzer, Stream, StreamState, StreamType,
-                               extract_x, y_range)
+                               convert_to_excel_data, extract_x, y_range)
 
 
 def main():
@@ -155,6 +155,15 @@ def main():
     ax.vlines(heats_merged, ymin=ymin, ymax=ymax, linestyles=':', colors='gray')
     ax.autoscale()
     fig.savefig("./tq_diagram_merged_with_vlines.png")
+
+    # TQ線図(Excel風)
+    hot_lines, cold_lines = analyzer.create_tq()
+    fig, ax = plt.subplots(1, 1)
+    ax.set_xlabel("Q [kW]")
+    ax.set_ylabel("T [℃]")
+    ax.plot(*convert_to_excel_data(hot_lines), color="#ff7f0e")
+    ax.plot(*convert_to_excel_data(cold_lines), color="#1f77b4")
+    fig.savefig("./tq_diagram_excel.png")
 
 
 if __name__ == '__main__':
