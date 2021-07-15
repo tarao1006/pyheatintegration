@@ -62,6 +62,17 @@ def main():
 
     # TQ線図
     hot_lines, cold_lines = analyzer.create_tq()
+
+    # 与熱複合線と受熱複合線
+    fig, ax = plt.subplots(1, 1)
+    ax.set_xlabel("Q [kW]")
+    ax.set_ylabel("T [℃]")
+    ax.add_collection(LineCollection(hot_lines, colors="#ff7f0e"))
+    ax.add_collection(LineCollection(cold_lines, colors="#1f77b4"))
+    ax.autoscale()
+    fig.savefig("./tq_diagram.png")
+
+    # 熱量の区間ごとのたて線も表示
     ymin, ymax = y_range(hot_lines + cold_lines)
     heats = extract_x(hot_lines + cold_lines)
     fig, ax = plt.subplots(1, 1)
@@ -71,10 +82,21 @@ def main():
     ax.add_collection(LineCollection(cold_lines, colors="#1f77b4"))
     ax.vlines(heats, ymin=ymin, ymax=ymax, linestyles=':', colors='k')
     ax.autoscale()
-    fig.savefig("./tq_diagram.png")
+    fig.savefig("./tq_diagram_with_vlines.png")
 
     # 分割したTQ線図
     hot_lines_separated, cold_lines_separated = analyzer.create_tq_separated()
+
+    # 与熱複合線と受熱複合線
+    fig, ax = plt.subplots(1, 1)
+    ax.set_xlabel("Q [kW]")
+    ax.set_ylabel("T [℃]")
+    ax.add_collection(LineCollection(hot_lines_separated, colors="#ff7f0e"))
+    ax.add_collection(LineCollection(cold_lines_separated, colors="#1f77b4"))
+    ax.autoscale()
+    fig.savefig("./tq_diagram_separeted.png")
+
+    # 熱量の区間ごとのたて線も表示
     ymin, ymax = y_range(hot_lines_separated + cold_lines_separated)
     heats_separated = extract_x(hot_lines_separated + cold_lines_separated)
     fig, ax = plt.subplots(1, 1)
@@ -83,12 +105,22 @@ def main():
     ax.add_collection(LineCollection(hot_lines_separated, colors="#ff7f0e"))
     ax.add_collection(LineCollection(cold_lines_separated, colors="#1f77b4"))
     ax.vlines(heats_separated, ymin=ymin, ymax=ymax, linestyles=':', colors='gray')
-    ax.vlines(heats, ymin=ymin, ymax=ymax, linestyles=':', colors='k')
     ax.autoscale()
-    fig.savefig("./tq_diagram_separeted.png")
+    fig.savefig("./tq_diagram_separeted_with_vlines.png")
 
     # 最小接近温度差を満たす分割したTQ線図
     hot_lines_splitted, cold_lines_splitted = analyzer.create_tq_splitted()
+
+    # 与熱複合線と受熱複合線
+    fig, ax = plt.subplots(1, 1)
+    ax.set_xlabel("Q [kW]")
+    ax.set_ylabel("T [℃]")
+    ax.add_collection(LineCollection(hot_lines_splitted, colors="#ff7f0e"))
+    ax.add_collection(LineCollection(cold_lines_splitted, colors="#1f77b4"))
+    ax.autoscale()
+    fig.savefig("./tq_diagram_splitted.png")
+
+    # 熱量の区間ごとのたて線も表示
     ymin, ymax = y_range(hot_lines_splitted + cold_lines_splitted)
     heats_splitted = extract_x(hot_lines_separated + cold_lines_separated)
     fig, ax = plt.subplots(1, 1)
@@ -97,12 +129,22 @@ def main():
     ax.add_collection(LineCollection(hot_lines_splitted, colors="#ff7f0e"))
     ax.add_collection(LineCollection(cold_lines_splitted, colors="#1f77b4"))
     ax.vlines(heats_splitted, ymin=ymin, ymax=ymax, linestyles=':', colors='gray')
-    ax.vlines(heats, ymin=ymin, ymax=ymax, linestyles=':', colors='k')
     ax.autoscale()
-    fig.savefig("./tq_diagram_splitted.png")
+    fig.savefig("./tq_diagram_splitted_with_vlines.png")
 
     # 熱交換器を結合したTQ線図
     hot_lines_merged, cold_lines_merged = analyzer.create_tq_merged()
+
+    # 与熱複合線と受熱複合線
+    fig, ax = plt.subplots(1, 1)
+    ax.set_xlabel("Q [kW]")
+    ax.set_ylabel("T [℃]")
+    ax.add_collection(LineCollection(hot_lines_merged, colors="#ff7f0e"))
+    ax.add_collection(LineCollection(cold_lines_merged, colors="#1f77b4"))
+    ax.autoscale()
+    fig.savefig("./tq_diagram_merged.png")
+
+    # 熱量の区間ごとのたて線も表示
     ymin, ymax = y_range(hot_lines_merged + cold_lines_merged)
     heats_merged = extract_x(hot_lines_merged + cold_lines_merged)
     fig, ax = plt.subplots(1, 1)
@@ -112,7 +154,7 @@ def main():
     ax.add_collection(LineCollection(cold_lines_merged, colors="#1f77b4"))
     ax.vlines(heats_merged, ymin=ymin, ymax=ymax, linestyles=':', colors='gray')
     ax.autoscale()
-    fig.savefig("./tq_diagram_merged.png")
+    fig.savefig("./tq_diagram_merged_with_vlines.png")
 
 
 if __name__ == '__main__':
