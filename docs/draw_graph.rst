@@ -45,7 +45,7 @@ Step3. Draw Graph
   ax.plot(heats, temps)
   fig.savefig("path/to/grand_composite_curve.png")
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/grand_composite_curve.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/grand_composite_curve.png
   :width: 400
   :align: center
 
@@ -149,9 +149,9 @@ TQ線図
   ax.autoscale()
   fig.savefig("path/to/tq_diagram_with_vlines.png")
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram.png
   :width: 45%
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_with_vlines.png
   :width: 45%
 
 .. _tq-diagram-separated:
@@ -184,9 +184,9 @@ TQ線図
   ax.autoscale()
   fig.savefig("path/to/tq_diagram_separeted_with_vlines.png")
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_separeted.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separeted.png
   :width: 45%
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_separeted.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separeted_with_vlines.png
   :width: 45%
 
 .. _tq-diagram-splitted:
@@ -219,9 +219,9 @@ TQ線図
   ax.autoscale()
   fig.savefig("path/to/tq_diagram_splitted_with_vlines.png")
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_splitted.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_splitted.png
   :width: 45%
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_splitted.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_splitted_with_vlines.png
   :width: 45%
 
 .. _tq-diagram-merged:
@@ -254,7 +254,7 @@ TQ線図
   ax.autoscale()
   fig.savefig("path/to/tq_diagram_merged_with_vlines.png")
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_merged.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_merged.png
   :width: 45%
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_merged.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_merged_with_vlines.png
   :width: 45%

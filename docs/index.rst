@@ -61,12 +61,12 @@ Quick Start
 
 * グランドコンポジットカーブ
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/grand_composite_curve.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/grand_composite_curve.png
   :width: 400
 
 * TQ線図
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram.png
   :width: 400
 
 より詳しい説明は :doc:`getting_started` を確認してください。
