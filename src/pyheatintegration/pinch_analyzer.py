@@ -154,12 +154,12 @@ class PinchAnalyzer:
             self.tq.cold_lines_separated
         )
 
-    def create_tq_splitted(self) -> tuple[list[Line], list[Line]]:
+    def create_tq_split(self) -> tuple[list[Line], list[Line]]:
         """流体ごとに分割し、最小接近温度差の条件を満たしたtq線図をを描くために必要な与熱複合線および受熱複合線を返します。
         """
         return (
-            self.tq.hot_lines_splitted,
-            self.tq.cold_lines_splitted
+            self.tq.hot_lines_split,
+            self.tq.cold_lines_split
         )
 
     def create_tq_merged(self) -> tuple[list[Line], list[Line]]:

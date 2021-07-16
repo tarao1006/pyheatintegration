@@ -11,7 +11,7 @@ Step3. Draw Graph
 * ``create_grand_composite_curve``: グランドコンポジットカーブ
 * ``create_tq``: TQ線図
 * ``create_tq_separated``: 流体ごとに分割したTQ線図
-* ``create_tq_splitted``: 流体ごとに分割し、最初接近温度差を満たすように分割したTQ線図
+* ``create_tq_split``: 流体ごとに分割し、最初接近温度差を満たすように分割したTQ線図
 * ``create_tq_merged``: 結合可能な熱交換器を結合したTQ線図
 
 例で用いる ``analyzer`` は以下のコードによって作成されたと仮定しています。
@@ -57,11 +57,11 @@ TQ線図
 
 * :ref:`tq-diagram`
 * :ref:`tq-diagram-separated`
-* :ref:`tq-diagram-splitted`
+* :ref:`tq-diagram-split`
 * :ref:`tq-diagram-merged`
 
 
-``create_tq()`` ``create_tq_separated()`` ``create_tq_splitted()`` ``create_tq_merged()``
+``create_tq()`` ``create_tq_separated()`` ``create_tq_split()`` ``create_tq_merged()``
 は、プロットに必要な直線を以下のような形式で返します。
 
 .. code-block:: python
@@ -170,7 +170,7 @@ TQ線図
   ax.add_collection(LineCollection(hot_lines_separated, colors="#ff7f0e"))
   ax.add_collection(LineCollection(cold_lines_separated, colors="#1f77b4"))
   ax.autoscale()
-  fig.savefig("path/to/tq_diagram_separeted.png")
+  fig.savefig("path/to/tq_diagram_separated.png")
 
   # 熱量の区間ごとのたて線も表示
   ymin, ymax = y_range(hot_lines_separated + cold_lines_separated)
@@ -182,46 +182,46 @@ TQ線図
   ax.add_collection(LineCollection(cold_lines_separated, colors="#1f77b4"))
   ax.vlines(heats_separated, ymin=ymin, ymax=ymax, linestyles=':', colors='gray')
   ax.autoscale()
-  fig.savefig("path/to/tq_diagram_separeted_with_vlines.png")
+  fig.savefig("path/to/tq_diagram_separated_with_vlines.png")
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separeted.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separated.png
   :width: 45%
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separeted_with_vlines.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separated_with_vlines.png
   :width: 45%
 
-.. _tq-diagram-splitted:
+.. _tq-diagram-split:
 
 最小接近温度差を満たすように流体を分割したTQ線図
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-  hot_lines_splitted, cold_lines_splitted = analyzer.create_tq_splitted()
+  hot_lines_split, cold_lines_split = analyzer.create_tq_split()
 
   # 与熱複合線と受熱複合線
   fig, ax = plt.subplots(1, 1)
   ax.set_xlabel("Q [kW]")
   ax.set_ylabel("T [℃]")
-  ax.add_collection(LineCollection(hot_lines_splitted, colors="#ff7f0e"))
-  ax.add_collection(LineCollection(cold_lines_splitted, colors="#1f77b4"))
+  ax.add_collection(LineCollection(hot_lines_split, colors="#ff7f0e"))
+  ax.add_collection(LineCollection(cold_lines_split, colors="#1f77b4"))
   ax.autoscale()
-  fig.savefig("path/to/tq_diagram_splitted.png")
+  fig.savefig("path/to/tq_diagram_split.png")
 
   # 熱量の区間ごとのたて線も表示
-  ymin, ymax = y_range(hot_lines_splitted + cold_lines_splitted)
-  heats_splitted = extract_x(hot_lines_separated + cold_lines_separated)
+  ymin, ymax = y_range(hot_lines_split + cold_lines_split)
+  heats_split = extract_x(hot_lines_separated + cold_lines_separated)
   fig, ax = plt.subplots(1, 1)
   ax.set_xlabel("Q [kW]")
   ax.set_ylabel("T [℃]")
-  ax.add_collection(LineCollection(hot_lines_splitted, colors="#ff7f0e"))
-  ax.add_collection(LineCollection(cold_lines_splitted, colors="#1f77b4"))
-  ax.vlines(heats_splitted, ymin=ymin, ymax=ymax, linestyles=':', colors='gray')
+  ax.add_collection(LineCollection(hot_lines_split, colors="#ff7f0e"))
+  ax.add_collection(LineCollection(cold_lines_split, colors="#1f77b4"))
+  ax.vlines(heats_split, ymin=ymin, ymax=ymax, linestyles=':', colors='gray')
   ax.autoscale()
-  fig.savefig("path/to/tq_diagram_splitted_with_vlines.png")
+  fig.savefig("path/to/tq_diagram_split_with_vlines.png")
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_splitted.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_split.png
   :width: 45%
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_splitted_with_vlines.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_split_with_vlines.png
   :width: 45%
 
 .. _tq-diagram-merged:

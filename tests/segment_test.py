@@ -81,7 +81,7 @@ class TeseSegment(unittest.TestCase):
         segment.split(200)
 
         self.assertEqual(
-            segment.hot_plot_segments_splitted,
+            segment.hot_plot_segments_split,
             [
                 PlotSegment(0, 70, 300, 400),
                 PlotSegment(70, 90, 300, 400),
@@ -90,7 +90,7 @@ class TeseSegment(unittest.TestCase):
         )
 
         self.assertEqual(
-            segment.cold_plot_segments_splitted,
+            segment.cold_plot_segments_split,
             [
                 PlotSegment(0, 70, 100, 200),
                 PlotSegment(70, 90, 100, 200),
