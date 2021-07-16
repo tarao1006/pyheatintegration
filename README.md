@@ -12,22 +12,22 @@
 
 <details>
   <summary>TQ線図</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_with_vlines.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図(流体ごとに分割)</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separated.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separated_with_vlines.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図(流体ごとに分割。最小接近温度差を満たす。)</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_split.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_split_with_vlines.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図(結合可能な熱交換器を結合。)</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_merged.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_merged_with_vlines.png" width="400">
 </details>
 
 ## Requirements
