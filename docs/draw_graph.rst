@@ -170,7 +170,7 @@ TQ線図
   ax.add_collection(LineCollection(hot_lines_separated, colors="#ff7f0e"))
   ax.add_collection(LineCollection(cold_lines_separated, colors="#1f77b4"))
   ax.autoscale()
-  fig.savefig("path/to/tq_diagram_separeted.png")
+  fig.savefig("path/to/tq_diagram_separated.png")
 
   # 熱量の区間ごとのたて線も表示
   ymin, ymax = y_range(hot_lines_separated + cold_lines_separated)
@@ -182,11 +182,11 @@ TQ線図
   ax.add_collection(LineCollection(cold_lines_separated, colors="#1f77b4"))
   ax.vlines(heats_separated, ymin=ymin, ymax=ymax, linestyles=':', colors='gray')
   ax.autoscale()
-  fig.savefig("path/to/tq_diagram_separeted_with_vlines.png")
+  fig.savefig("path/to/tq_diagram_separated_with_vlines.png")
 
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separeted.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separated.png
   :width: 45%
-.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separeted_with_vlines.png
+.. image:: https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separated_with_vlines.png
   :width: 45%
 
 .. _tq-diagram-splitted:

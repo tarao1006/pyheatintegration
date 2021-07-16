@@ -17,7 +17,7 @@
 
 <details>
   <summary>TQ線図(流体ごとに分割)</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separeted.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separated.png" width="400">
 </details>
 
 <details>
