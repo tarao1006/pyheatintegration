@@ -61,7 +61,7 @@ class PinchAnalyzer:
         self,
         streams_: list[Stream],
         minimum_approach_temp_diff: float,
-        ignore_maximum: bool = False
+        force_validation: bool = False
     ):
         streams = deepcopy(streams_)
 
@@ -77,9 +77,19 @@ class PinchAnalyzer:
         if not is_valid_streams(streams):
             raise ValueError('与熱流体および受熱流体は少なくとも1つは指定する必要があります。')
 
+        # 外部流体が存在する場合は検証を行う。
+        ignore_validation = True
+        for stream in streams:
+            if stream.is_external():
+                ignore_validation = False
+                break
+
+        if force_validation:
+            ignore_validation = False
+
         self.minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(
             streams,
-            ignore_maximum
+            ignore_validation
         )
 
         if minimum_approach_temp_diff not in self.minimum_approach_temp_diff_range:

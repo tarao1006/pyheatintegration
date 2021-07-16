@@ -357,13 +357,13 @@ def _merge_segments(
 
 def get_possible_minimum_temp_diff_range(
     streams: list[Stream],
-    ignore_maximum: bool = False
+    ignore_validation: bool = False
 ) -> TemperatureRange:
     """設定可能な最小接近温度差を返します。
 
     Args:
         streams (list[Stream]): 流体のリスト。
-        ignore_maximum (bool): 最大値のチェックを無視するか。
+        ignore_validation (bool): 最大値のチェックを無視するか。
 
     Returns:
         float: 可能な最小接近温度差[℃]。
@@ -384,7 +384,7 @@ def get_possible_minimum_temp_diff_range(
         stream.input_temperature() for stream in streams if stream.is_cold()
     )
 
-    if ignore_maximum:
+    if ignore_validation:
         maximum_minimum_approch_temp_diff = hot_maximum_temp - cold_minimum_temp
     else:
         if hot_minimum_temp - cold_minimum_temp < 0:
