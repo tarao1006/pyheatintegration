@@ -24,7 +24,7 @@ Quick Start
   import matplotlib.pyplot as plt
   from matplotlib.collections import LineCollection
 
-  from src.pyheatintegration import PinchAnalyzer, Stream
+  from pyheatintegration import PinchAnalyzer, Stream
 
   # 熱交換を行う流体を準備
   streams = [
