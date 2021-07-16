@@ -28,3 +28,17 @@ Heat Exchanger Cost
 を参考にして指定しています ( :ref:`総括伝熱係数の表 <overall_heat_transfer_coefficient>` )。\
 また、対数平均温度差は向流を仮定して求めています。係数 :math:`k` は ``Stream`` のコンストラ\
 クタの引数 ``reboiler_or_reactor`` の値を用いて決定しています。
+
+熱交換器コストの合計は、 ``PinchAnalyzer`` 経由で取得することが可能です。
+
+.. code-block:: python
+
+  analyzer.get_heat_exchanger_cost(ignore_unknown=True)
+  # or 
+  analyzer.get_heat_exchanger_cost(ignore_unknown=False)
+
+コスト計算の際に、流体の状態が ``StreamState.UNKNOWN`` に設定されている場合、総括伝熱係数が\
+設定されていないため、熱交換器の面積を求めることができず、コストを求めることができません。その際\
+に、エラーを生じさせるかどうかを ``ignore_unknown`` によって設定することが可能です。\
+``True`` の場合、エラーは生じず、 ``False``　の場合、エラーが生じ、プログラムが終了します。\
+デフォルトは ``True`` に設定されています。
