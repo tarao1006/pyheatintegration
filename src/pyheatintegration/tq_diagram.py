@@ -25,8 +25,8 @@ class TQDiagram:
         cold_linse (list[Line]): TQ線図の受熱複合線(プロット用の直線のリスト)。
         hot_lines_separated (list[Line]): 流体ごとに分割した与熱複合線(プロット用の直線のリスト)。
         cold_lines_separated (list[Line]): 流体ごとに分割した受熱複合線(プロット用の直線のリスト)。
-        hot_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした与熱複合線(プロット用の直線のリスト)。
-        cold_lines_splitted (list[Line]): 流体ごとに分割し、最小接近温度差を満たした受熱複合線(プロット用の直線のリスト)。
+        hot_lines_split (list[Line]): 流体ごとに分割し、最小接近温度差を満たした与熱複合線(プロット用の直線のリスト)。
+        cold_lines_split (list[Line]): 流体ごとに分割し、最小接近温度差を満たした受熱複合線(プロット用の直線のリスト)。
         hot_lines_merged (list[Line]): 熱交換器を結合した与熱複合線(プロット用の直線のリスト)。
         cold_lines_merged (list[Line]): 熱交換器を結合した受熱複合線(プロット用の直線のリスト)。
         hcc_merged (list[PlotSegment]): 熱交換器を結合した与熱複合線。
@@ -69,8 +69,8 @@ class TQDiagram:
         self.hot_lines_separated = segments.hot_lines_separated()
         self.cold_lines_separated = segments.cold_lines_separated()
 
-        self.hot_lines_splitted = segments.hot_lines_splitted()
-        self.cold_lines_splitted = segments.cold_lines_splitted()
+        self.hot_lines_split = segments.hot_lines_split()
+        self.cold_lines_split = segments.cold_lines_split()
 
         # 結合可能なセグメント同士を結合する。
         self.hcc_merged, self.ccc_merged = _merge_segments(segments)
@@ -291,10 +291,10 @@ def _merge_segments(
     """
     segments = deepcopy(segments_)
     hot_plot_segments = sorted([
-        plot_segment for segment in segments for plot_segment in segment.hot_plot_segments_splitted
+        plot_segment for segment in segments for plot_segment in segment.hot_plot_segments_split
     ])
     cold_plot_segments = sorted([
-        plot_segment for segment in segments for plot_segment in segment.cold_plot_segments_splitted
+        plot_segment for segment in segments for plot_segment in segment.cold_plot_segments_split
     ])
     heat_ranges = get_heat_ranges(
         flatten_heat_ranges(

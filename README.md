@@ -22,7 +22,7 @@
 
 <details>
   <summary>TQ線図(流体ごとに分割。最小接近温度差を満たす。)</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_splitted.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_split.png" width="400">
 </details>
 
 <details>

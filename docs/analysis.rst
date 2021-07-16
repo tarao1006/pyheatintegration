@@ -62,5 +62,5 @@ Step2. Analysis
 * ``create_grand_composite_curve``: グランドコンポジットカーブ
 * ``create_tq``: TQ線図
 * ``create_tq_separated``: 流体ごとに分割したTQ線図
-* ``create_tq_splitted``: 流体ごとに分割し、最初接近温度差を満たすように分割したTQ線図
+* ``create_tq_split``: 流体ごとに分割し、最初接近温度差を満たすように分割したTQ線図
 * ``create_tq_merged``: 結合可能な熱交換器を結合したTQ線図
