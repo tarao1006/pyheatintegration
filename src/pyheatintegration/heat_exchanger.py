@@ -1,7 +1,7 @@
 import math
 
 from .enums import StreamState
-from .heat_range import HeatRange
+from .heat_range import HeatRange, merge_heat_range
 from .plot_segment import PlotSegment
 
 OVERALL_HEAT_TRANSFER_COEFFICIENT = {
@@ -196,7 +196,7 @@ def merge_heat_exchangers(heat_exchanger: HeatExchanger, other: HeatExchanger) -
     Returns:
         HeatExchanger: 結合後の熱交換器。
     """
-    heat_range = heat_exchanger.heat_range.merge(other.heat_range)
+    heat_range = merge_heat_range(heat_exchanger.heat_range, other.heat_range)
     hot_plot_segment = heat_exchanger.hot_plot_segment.merge(other.hot_plot_segment)
     cold_plot_segment = heat_exchanger.cold_plot_segment.merge(other.cold_plot_segment)
 

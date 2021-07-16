@@ -2,50 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 from .stream import Stream, get_temperature_range_streams
-from .temperature_range import TemperatureRange, get_temperatures
-
-
-def _get_heats(
-    temp_ranges: list[TemperatureRange],
-    temp_range_streams: defaultdict[TemperatureRange, set[Stream]]
-) -> list[float]:
-    """温度変化領域ごとの熱量変化を求めます。
-
-    Args:
-        temp_ranges: list[TemperatureRange]: 温度領域のリスト。
-        temp_range_lacking_heat: dict[TemperatureRange, float]:
-            温度領域ごとの過不足熱量。
-
-    Returns:
-        list[float]: 熱量のリスト。
-    """
-    temp_range_lacking_heat = _get_lacking_heats(temp_range_streams)
-
-    temp_ranges.sort()
-    heats = [0.0] * (len(temp_ranges) + 1)
-    for i, temp_range in enumerate(temp_ranges):
-        heats[i + 1] = heats[i] - temp_range_lacking_heat[temp_range]
-    min_heat = min(heats)
-
-    return [heat - min_heat for heat in heats]
-
-
-def _get_lacking_heats(
-    temp_range_streams: defaultdict[TemperatureRange, set[Stream]]
-) -> defaultdict[TemperatureRange, float]:
-    """温度領域ごとの不足熱量を求めます.
-
-    Args:
-        temp_range_streams defaultdict[float, set[Stream]]:
-            温度領域ごとの流体のセット。
-
-    Returns:
-        defaultdict[TemperatureRange, float]: 温度領域ごとの過不足熱量。
-    """
-    return defaultdict(int, {
-        temp_range: sum([s.heat() for s in streams if s.is_hot()]) - sum([s.heat() for s in streams if s.is_cold()])
-        for temp_range, streams in temp_range_streams.items()
-    })
+from .temperature_range import TemperatureRange, flatten_temperature_ranges
 
 
 class GrandCompositeCurve:
@@ -58,12 +15,10 @@ class GrandCompositeCurve:
     Attributes:
         extarnal_streams (list[Stream]): 外部流体。
         minimum_approach_temp_diff (float): 最小接近温度差[℃]。
-        maximum_pinch_point_temp (float): 最高温であるピンチポイントの温度[℃]。
-        maximum_pinch_point_index (int): 最も温度が高いピンチポイントのインデックス。
-        minimum_pinch_point_temp (float): 最低音であるピンチポイントの温度[℃]。
-        minimum_pinch_point_index (int): 最も温度が低いピンチポイントのインデックス。
         temps (list[float]): 温度のリスト[℃]。
         heats (list[float]): 熱量のリスト[W]。
+        pinch_points (list[tuple[int, float]]):
+            ピンチポイントとなるインデックスと温度のtupleのリスト。
     """
 
     def __init__(
@@ -88,110 +43,76 @@ class GrandCompositeCurve:
         temp_ranges, temp_range_streams = get_temperature_range_streams([
             stream for stream in streams if stream.is_internal()
         ])
-        self.temps = get_temperatures(temp_ranges)
+        temp_ranges.sort()
+
+        self.temps = flatten_temperature_ranges(temp_ranges)
         self.heats = _get_heats(temp_ranges, temp_range_streams)
 
-        pinch_point_info = self._get_pinch_point()
-        self.maximum_pinch_point_temp = pinch_point_info[0]
-        self.maximum_pinch_point_index = pinch_point_info[1]
-        self.minimum_pinch_point_temp = pinch_point_info[2]
-        self.minimum_pinch_point_index = pinch_point_info[3]
-
-    def _get_pinch_point(self) -> tuple[float, int, float, int]:
-        """ピンチポイントとピンチポイントのインデックスを求めます。
-        """
-        pinch_point_indexes = [
-            i for i, heat in enumerate(self.heats) if heat == 0
+        self.pinch_points = [
+            (i, self.temps[i]) for i, heat in enumerate(self.heats) if heat == 0
         ]
-        pinch_points = [self.temps[i] for i in pinch_point_indexes]
 
-        return (
-            pinch_points[-1],
-            pinch_point_indexes[-1],
-            pinch_points[0],
-            pinch_point_indexes[0]
-        )
+    def pinch_point_temp(self) -> float:
+        """ピンチポイントの温度を返します。
+
+        ピンチポイントが複数ある場合、最小値を返します。
+
+        Raises:
+            RuntimeError: ピンチポイントが求まっていないかピンチポイントが存在しない場合。
+        """
+        if not self.pinch_points:
+            raise RuntimeError('ピンチポイントが求まっていません。')
+
+        return self.pinch_points[0][1]
 
     def solve_external_heat(self) -> dict[str, float]:
         """外部流体による熱交換量を求めます.
 
         Returns:
-            dict[int, float]:
-                流体のidごとの交換熱量。
+            dict[int, float]: 流体のidごとの交換熱量。
 
         Raises:
             RuntimeError: ピンチポイントを求める前に呼び出した場合。
         """
-        if not hasattr(self, 'maximum_pinch_point_temp') \
-           or not hasattr(self, 'minimum_pinch_point_temp'):
+        if not self.pinch_points:
             raise RuntimeError('ピンチポイントが求まっていません。')
 
-        external_cold_streams = [
-            stream for stream in self.external_streams if stream.is_cold()
-        ]
-        external_hot_streams = [
-            stream for stream in self.external_streams if stream.is_hot()
-        ]
+        hot_streams = self._update_external_streams_heat(
+            [stream for stream in self.external_streams if stream.is_hot()],
+            self.heats[self.pinch_points[-1][0]:],
+            self.temps[self.pinch_points[-1][0]:],
+            self.pinch_points[-1][1]
+        )
 
-        updated_external_streams = self._update_external_streams(
-            external_cold_streams,
-            external_hot_streams
+        cold_streams = self._update_external_streams_heat(
+            [stream for stream in self.external_streams if stream.is_cold()],
+            self.heats[self.pinch_points[0][0]::-1],
+            self.temps[self.pinch_points[0][0]::-1],
+            self.pinch_points[0][1]
         )
 
         return {
-            stream.id_: stream.heat()
-            for stream in updated_external_streams
+            stream.id_: stream.heat() for stream in hot_streams + cold_streams
         }
-
-    def _update_external_streams(
-            self,
-            external_cold_streams: list[Stream],
-            external_hot_streams: list[Stream]
-    ) -> list[Stream]:
-        """外部流体によって交換される熱量を求めます。
-
-        Args:
-            external_cold_streams (list[Stream]): 外部受熱流体。
-            external_hot_streams (list[Stream]): 外部与熱流体。
-
-        Returns:
-            tuple[list[Stream]]:
-                交換熱量の情報を追加した外部流体。
-        """
-        # ピンチポイントの上下に分割し、ピンチポイントに近い順に優先的に熱交換を行わせる。
-        heats_heating = self.heats[self.maximum_pinch_point_index:]
-        temps_heating = self.temps[self.maximum_pinch_point_index:]
-        heats_cooling = self.heats[self.minimum_pinch_point_index::-1]
-        temps_cooling = self.temps[self.minimum_pinch_point_index::-1]
-
-        return (
-            self._update_external_streams_heat(
-                external_hot_streams,
-                heats_heating,
-                temps_heating,
-                self.maximum_pinch_point_temp
-            )
-            + self._update_external_streams_heat(
-                external_cold_streams,
-                heats_cooling,
-                temps_cooling,
-                self.minimum_pinch_point_temp
-            )
-        )
 
     def _update_external_streams_heat(
         self,
         streams: list[Stream],
         heats: list[float],
         temps: list[float],
-        pinch_point: float
+        pinch_point_temp: float
     ) -> list[Stream]:
         """外部流体の交換熱量を決定します。
+
+        ピンチポイントが複数ある場合、pinch_point_tempは与熱流体と受熱流体で変わります。与
+        熱流体の場合は、ピンチポイントのうち最大温度の点、受熱流体の場合は、ピンチポイントのう
+        ち最小温度の点となります。
 
         Args:
             streams list[Stream]: 流体。
             heats list[float]: 熱量変化。
             temps list[float]: 温度変化。
+            pinch_point_temp (float): ピンチポイントの温度。
 
         Returns:
             list[Stream]: 情報を更新した流体のリスト。
@@ -199,28 +120,28 @@ class GrandCompositeCurve:
         heated = 0.0
         not_heated = heats[-1]
 
-        streams.sort(
-            key=lambda stream: abs(stream.output_temperature() - pinch_point)
-        )
+        streams.sort(key=lambda stream: stream.cost)
         for stream in streams:
             # すでに交換熱量が設定されている場合にはスキップする。
             if stream.heat() != 0:
                 continue
 
-            if (stream.is_hot() and stream.output_temperature() < pinch_point) \
-               or (stream.is_cold() and stream.output_temperature() > pinch_point):
+            target_temperature = stream.output_temperature()
+
+            # 与熱流体の場合は、出口温度がピンチポイントの温度より低い時、受熱流体の場合は、
+            # 出口温度がピンチポイントの温度より高い時、外部流体として用いることができない。
+            if (stream.is_hot() and target_temperature < pinch_point_temp) \
+               or (stream.is_cold() and target_temperature > pinch_point_temp):
                 continue
 
-            target_temperature = stream.output_temperature()
             for i in range(len(heats)):
                 if i == len(heats) - 1:
+                    # 与熱流体の場合は、流体温度がtemps[i]よりも大きい時、受熱流体の場合は、
+                    # 流体温度がtemps[i]より小さい時、外部流体として用いることができる。
                     if (stream.is_hot() and target_temperature >= temps[i]) \
                        or (stream.is_cold() and target_temperature <= temps[i]):
-                        heat = not_heated
-                        stream.update_heat(heat)
-                        heated += heat
-                        not_heated -= heat
-                    break
+                        stream.update_heat(not_heated)
+                        break
                 start_temp = temps[i]
                 finish_temp = temps[i + 1]
                 temp_range = TemperatureRange(start_temp, finish_temp)
@@ -241,3 +162,46 @@ class GrandCompositeCurve:
                     break
 
         return streams
+
+
+def _get_heats(
+    temp_ranges: list[TemperatureRange],
+    temp_range_streams: defaultdict[TemperatureRange, set[Stream]]
+) -> list[float]:
+    """温度変化領域ごとの熱量変化を求めます。
+
+    Args:
+        temp_ranges: list[TemperatureRange]: 温度領域のリスト。
+        temp_range_streams defaultdict[TemperatureRange, set[Stream]]:
+            温度領域ごとの流体のセット。
+
+    Returns:
+        list[float]: 熱量のリスト。
+    """
+    temp_range_lacking_heat = _get_lacking_heats(temp_range_streams)
+
+    temp_ranges.sort()
+    heats = [0.0] * (len(temp_ranges) + 1)
+    for i, temp_range in enumerate(temp_ranges):
+        heats[i + 1] = heats[i] - temp_range_lacking_heat[temp_range]
+    min_heat = min(heats)
+
+    return [heat - min_heat for heat in heats]
+
+
+def _get_lacking_heats(
+    temp_range_streams: defaultdict[TemperatureRange, set[Stream]]
+) -> defaultdict[TemperatureRange, float]:
+    """温度領域ごとの不足熱量を求めます.
+
+    Args:
+        temp_range_streams defaultdict[TemperatureRange, set[Stream]]
+            温度領域ごとの流体のセット。
+
+    Returns:
+        defaultdict[TemperatureRange, float]: 温度領域ごとの過不足熱量。
+    """
+    return defaultdict(int, {
+        temp_range: sum(s.heat() for s in streams if s.is_hot()) - sum(s.heat() for s in streams if s.is_cold())
+        for temp_range, streams in temp_range_streams.items()
+    })

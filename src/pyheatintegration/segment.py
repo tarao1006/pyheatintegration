@@ -2,7 +2,8 @@ from collections import UserList
 from copy import deepcopy
 from typing import Optional, cast
 
-from .heat_range import REL_TOL_DIGIT, HeatRange, get_heat_ranges, get_heats
+from .heat_range import (REL_TOL_DIGIT, HeatRange, flatten_heat_ranges,
+                         get_heat_ranges)
 from .line import Line
 from .plot_segment import PlotSegment, get_plot_segments, temp_diff
 from .stream import Stream
@@ -21,8 +22,8 @@ class Segment:
     cold_plot_segments: list[PlotSegment]
     hot_plot_segments_separated: list[PlotSegment]
     cold_plot_segments_separated: list[PlotSegment]
-    hot_plot_segments_splitted: list[PlotSegment]
-    cold_plot_segments_splitted: list[PlotSegment]
+    hot_plot_segments_split: list[PlotSegment]
+    cold_plot_segments_split: list[PlotSegment]
 
     def __init__(
         self,
@@ -64,11 +65,11 @@ class Segment:
                 self.cold_temperature_range
             )
 
-        hot_heats = get_heats([
+        hot_heats = flatten_heat_ranges([
             plot_segment.heat_range
             for plot_segment in self.hot_plot_segments_separated_streams
         ])
-        cold_heats = get_heats([
+        cold_heats = flatten_heat_ranges([
             plot_segment.heat_range
             for plot_segment in self.cold_plot_segments_separated_streams
         ])
@@ -219,8 +220,8 @@ class Segment:
                             cold_plot_segment.reboiler_or_reactor
                         )
 
-        self.hot_plot_segments_splitted = sorted(list(hot_heat_range_plot_segment.values()))
-        self.cold_plot_segments_splitted = sorted(list(cold_heat_range_plot_segment.values()))
+        self.hot_plot_segments_split = sorted(list(hot_heat_range_plot_segment.values()))
+        self.cold_plot_segments_split = sorted(list(cold_heat_range_plot_segment.values()))
 
 
 class Segments(UserList[Segment]):
@@ -243,11 +244,11 @@ class Segments(UserList[Segment]):
     def cold_lines_separated(self) -> list[Line]:
         return [line for segment in self.data for line in self.get_lines(segment.cold_plot_segments_separated)]
 
-    def hot_lines_splitted(self) -> list[Line]:
-        return [line for segment in self.data for line in self.get_lines(segment.hot_plot_segments_splitted)]
+    def hot_lines_split(self) -> list[Line]:
+        return [line for segment in self.data for line in self.get_lines(segment.hot_plot_segments_split)]
 
-    def cold_lines_splitted(self) -> list[Line]:
-        return [line for segment in self.data for line in self.get_lines(segment.cold_plot_segments_splitted)]
+    def cold_lines_split(self) -> list[Line]:
+        return [line for segment in self.data for line in self.get_lines(segment.cold_plot_segments_split)]
 
     def split(self, minimum_approach_temp_diff: float) -> None:
         for segment in self.data:

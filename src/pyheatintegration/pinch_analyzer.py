@@ -3,7 +3,7 @@ from copy import deepcopy
 
 from .grand_composite_curve import GrandCompositeCurve
 from .heat_exchanger import HeatExchanger
-from .heat_range import HeatRange, get_detailed_heat_ranges
+from .heat_range import HeatRange, get_merged_heat_ranges
 from .line import Line
 from .plot_segment import PlotSegment, get_plot_segments
 from .stream import Stream, is_valid_streams
@@ -61,7 +61,7 @@ class PinchAnalyzer:
         self,
         streams_: list[Stream],
         minimum_approach_temp_diff: float,
-        ignore_maximum: bool = False
+        force_validation: bool = False
     ):
         streams = deepcopy(streams_)
 
@@ -77,9 +77,19 @@ class PinchAnalyzer:
         if not is_valid_streams(streams):
             raise ValueError('与熱流体および受熱流体は少なくとも1つは指定する必要があります。')
 
+        # 外部流体が存在する場合は検証を行う。
+        ignore_validation = True
+        for stream in streams:
+            if stream.is_external():
+                ignore_validation = False
+                break
+
+        if force_validation:
+            ignore_validation = False
+
         self.minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(
             streams,
-            ignore_maximum
+            ignore_validation
         )
 
         if minimum_approach_temp_diff not in self.minimum_approach_temp_diff_range:
@@ -101,14 +111,14 @@ class PinchAnalyzer:
                     stream.update_heat(heat)
 
         self.streams = [stream for stream in streams if stream.heat() != 0]
-        self.pinch_point_temp = self.gcc.maximum_pinch_point_temp
+        self.pinch_point_temp = self.gcc.pinch_point_temp()
         self.tq = TQDiagram(
             self.streams,
             minimum_approach_temp_diff,
             self.pinch_point_temp
         )
 
-        all_heat_ranges = get_detailed_heat_ranges(
+        all_heat_ranges = get_merged_heat_ranges(
             [
                 [plot_segment.heat_range for plot_segment in self.tq.hcc_merged],
                 [plot_segment.heat_range for plot_segment in self.tq.ccc_merged]
@@ -154,12 +164,12 @@ class PinchAnalyzer:
             self.tq.cold_lines_separated
         )
 
-    def create_tq_splitted(self) -> tuple[list[Line], list[Line]]:
+    def create_tq_split(self) -> tuple[list[Line], list[Line]]:
         """流体ごとに分割し、最小接近温度差の条件を満たしたtq線図をを描くために必要な与熱複合線および受熱複合線を返します。
         """
         return (
-            self.tq.hot_lines_splitted,
-            self.tq.cold_lines_splitted
+            self.tq.hot_lines_split,
+            self.tq.cold_lines_split
         )
 
     def create_tq_merged(self) -> tuple[list[Line], list[Line]]:

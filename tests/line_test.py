@@ -1,6 +1,6 @@
 import unittest
 
-from src.pyheatintegration.line import extract_x, y_range
+from src.pyheatintegration.line import convert_to_excel_data, extract_x, y_range
 
 
 class TestLine(unittest.TestCase):
@@ -25,6 +25,19 @@ class TestLine(unittest.TestCase):
                 ((3, 3), (5, 8))
             ]),
             [0, 1, 2, 3, 5]
+        )
+
+
+class TestConvertToExcelData(unittest.TestCase):
+
+    def test_should_success(self):
+        self.assertEqual(
+            ([0, 1, 3, 4], [0, 2, 3, 5]),
+            convert_to_excel_data([((0, 0), (1, 2)), ((1, 2), (3, 3)), ((3, 3), (4, 5))])
+        )
+        self.assertEqual(
+            ([0, 1, 1, 2], [0, 2, 0, 2]),
+            convert_to_excel_data([((0, 0), (1, 2)), ((1, 0), (2, 2))])
         )
 
 
