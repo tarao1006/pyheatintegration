@@ -7,27 +7,27 @@
 
 <details>
   <summary>グランドコンポジットカーブ</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/grand_composite_curve.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/grand_composite_curve.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図(流体ごとに分割)</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_separeted.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_separeted.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図(流体ごとに分割。最小接近温度差を満たす。)</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_splitted.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_splitted.png" width="400">
 </details>
 
 <details>
   <summary>TQ線図(結合可能な熱交換器を結合。)</summary>
-  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/docs/images/tq_diagram_merged.png" width="400">
+  <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/develop/examples/simple/tq_diagram_merged.png" width="400">
 </details>
 
 ## Requirements
