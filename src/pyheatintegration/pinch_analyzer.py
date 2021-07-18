@@ -1,6 +1,7 @@
 import math
 from copy import deepcopy
 
+from .errors import PyHeatIntegrationError
 from .grand_composite_curve import GrandCompositeCurve
 from .heat_exchanger import HeatExchanger
 from .heat_range import HeatRange, get_merged_heat_ranges
@@ -71,14 +72,14 @@ class PinchAnalyzer:
             ignore_validation = False
 
         if message := PinchAnalyzer.validate_streams(streams, ignore_validation):
-            raise ValueError(message)
+            raise PyHeatIntegrationError(message)
 
         self.minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(
             streams, ignore_validation
         )
 
         if minimum_approach_temp_diff not in self.minimum_approach_temp_diff_range:
-            raise ValueError(
+            raise PyHeatIntegrationError(
                 "最小接近温度差が不正です。"
                 f"指定最小接近温度差 [℃]: {minimum_approach_temp_diff}, "
                 f"設定可能最小接近温度差 [℃]: {self.minimum_approach_temp_diff_range.start:.3f}"
