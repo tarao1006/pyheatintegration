@@ -40,7 +40,7 @@ class PinchAnalyzer:
     Args:
         streams_ (list[Stream]): 流体のリスト。
         minimum_approach_temp_diff (float): 最小接近温度差 [℃]。
-        ignore_maximum (bool): 最小接近温度差の最大値のチェックを無視するかどうか。
+        force_validation (bool): 与熱流体と受熱流体の最高温度と最低温度の関係の検証を強制するか。
 
     Attributes:
         gcc (GrandCompositeCurve): グランドコンポジットカーブ。
