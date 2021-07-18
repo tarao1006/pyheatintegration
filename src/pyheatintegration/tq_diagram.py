@@ -387,20 +387,6 @@ def get_possible_minimum_temp_diff_range(
     if ignore_validation:
         maximum_minimum_approch_temp_diff = hot_maximum_temp - cold_minimum_temp
     else:
-        if hot_minimum_temp - cold_minimum_temp < 0:
-            raise ValueError(
-                '与熱流体の最低温度が受熱流体の最低温度を下回っています。'
-                f'与熱流体最低温度: {hot_minimum_temp:.3f} ℃ '
-                f'受熱流体最低温度: {cold_minimum_temp:.3f} ℃'
-            )
-
-        if hot_maximum_temp - cold_maximum_temp < 0:
-            raise ValueError(
-                '与熱流体の最高温度が受熱流体の最高温度を下回っています。'
-                f'与熱流体最高温度: {hot_maximum_temp:.3f} ℃ '
-                f'受熱流体最高温度: {cold_maximum_temp:.3f} ℃'
-            )
-
         maximum_minimum_approch_temp_diff = min(
             hot_maximum_temp - cold_maximum_temp,
             hot_minimum_temp - cold_minimum_temp
