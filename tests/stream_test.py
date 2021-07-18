@@ -4,8 +4,7 @@ from collections import defaultdict
 from src.pyheatintegration.enums import StreamType
 from src.pyheatintegration.errors import InvalidStreamError
 from src.pyheatintegration.stream import (Stream,
-                                          get_temperature_range_streams,
-                                          is_valid_streams)
+                                          get_temperature_range_streams)
 from src.pyheatintegration.temperature_range import TemperatureRange
 
 
@@ -67,22 +66,6 @@ class TestGetTemperatureRangeStreams(unittest.TestCase):
                 self.assertEqual(result_stream.temperature_range, expected_stream.temperature_range)
                 self.assertEqual(result_stream.heat_flow, expected_stream.heat_flow)
                 self.assertEqual(result_stream.type_, expected_stream.type_)
-
-
-class TestIsValidStreams(unittest.TestCase):
-
-    def test_is_valid_streams(self):
-        self.assertTrue(is_valid_streams([
-            Stream(40, 90, 150),
-            Stream(80, 110, 180),
-            Stream(125, 80, 160),
-            Stream(100, 60, 160)
-        ]))
-
-        self.assertFalse(is_valid_streams([
-            Stream(40, 90, 150),
-            Stream(80, 110, 180)
-        ]))
 
 
 if __name__ == '__main__':
