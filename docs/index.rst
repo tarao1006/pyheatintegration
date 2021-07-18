@@ -24,14 +24,14 @@ Quick Start
   import matplotlib.pyplot as plt
   from matplotlib.collections import LineCollection
 
-  from pyheatintegration import PinchAnalyzer, Stream
+  from pyheatintegration import PinchAnalyzer, Stream, extract_x, y_range
 
   # 熱交換を行う流体を準備
   streams = [
-    Stream(40.0, 90.0, 150.0),
-    Stream(80.0, 110.0, 180.0),
-    Stream(125.0, 80.0, 180.0),
-    Stream(100.0, 60.0, 160.0)
+      Stream(40.0, 90.0, 150.0),
+      Stream(80.0, 110.0, 180.0),
+      Stream(125.0, 80.0, 180.0),
+      Stream(100.0, 60.0, 160.0)
   ]
 
   # 最小接近温度差を指定し、作成した流体のリストとともにPinchAnalyzerのインスタンスを得る。

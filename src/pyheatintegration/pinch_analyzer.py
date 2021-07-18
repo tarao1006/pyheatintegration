@@ -1,12 +1,13 @@
 import math
 from copy import deepcopy
 
+from .errors import PyHeatIntegrationError
 from .grand_composite_curve import GrandCompositeCurve
 from .heat_exchanger import HeatExchanger
 from .heat_range import HeatRange, get_merged_heat_ranges
 from .line import Line
 from .plot_segment import PlotSegment, get_plot_segments
-from .stream import Stream, is_valid_streams
+from .stream import Stream
 from .tq_diagram import TQDiagram, get_possible_minimum_temp_diff_range
 
 
@@ -40,7 +41,7 @@ class PinchAnalyzer:
     Args:
         streams_ (list[Stream]): 流体のリスト。
         minimum_approach_temp_diff (float): 最小接近温度差 [℃]。
-        ignore_maximum (bool): 最小接近温度差の最大値のチェックを無視するかどうか。
+        force_validation (bool): 与熱流体と受熱流体の最高温度と最低温度の関係の検証を強制するか。
 
     Attributes:
         gcc (GrandCompositeCurve): グランドコンポジットカーブ。
@@ -61,39 +62,24 @@ class PinchAnalyzer:
         self,
         streams_: list[Stream],
         minimum_approach_temp_diff: float,
-        force_validation: bool = False
+        force_validation: bool = True
     ):
         streams = deepcopy(streams_)
 
-        id_set: set[str] = set()
-        for stream in streams:
-            if stream.id_ in id_set:
-                raise ValueError(
-                    '流体のidは一意である必要があります。'
-                    f'重複しているid: {stream.id_}'
-                )
-            id_set.add(stream.id_)
-
-        if not is_valid_streams(streams):
-            raise ValueError('与熱流体および受熱流体は少なくとも1つは指定する必要があります。')
-
-        # 外部流体が存在する場合は検証を行う。
-        ignore_validation = True
-        for stream in streams:
-            if stream.is_external():
-                ignore_validation = False
-                break
+        ignore_validation = not any(stream.is_external() for stream in streams)
 
         if force_validation:
             ignore_validation = False
 
+        if message := PinchAnalyzer.validate_streams(streams, ignore_validation):
+            raise PyHeatIntegrationError(message)
+
         self.minimum_approach_temp_diff_range = get_possible_minimum_temp_diff_range(
-            streams,
-            ignore_validation
+            streams, ignore_validation
         )
 
         if minimum_approach_temp_diff not in self.minimum_approach_temp_diff_range:
-            raise ValueError(
+            raise PyHeatIntegrationError(
                 "最小接近温度差が不正です。"
                 f"指定最小接近温度差 [℃]: {minimum_approach_temp_diff}, "
                 f"設定可能最小接近温度差 [℃]: {self.minimum_approach_temp_diff_range.start:.3f}"
@@ -142,6 +128,56 @@ class PinchAnalyzer:
             self.heat_exchangers.append(
                 HeatExchanger(heat_range, hot_plot_segment, cold_plot_segment)
             )
+
+    @staticmethod
+    def validate_streams(
+        streams: list[Stream],
+        ignore_validation: bool = False
+    ) -> str:
+        # idの重複を検証。必ず検証する必要あり。
+        id_set: set[str] = set()
+        for stream in streams:
+            if stream.id_ in id_set:
+                return (
+                    '流体のidは一意である必要があります。'
+                    f'重複しているid: {stream.id_}'
+                )
+            id_set.add(stream.id_)
+
+        # 与熱流体と受熱流体が必ず一つ以上設定されていることを検証。必ず検証する必要がり。
+        hot_streams = [stream for stream in streams if stream.is_hot()]
+        cold_streams = [stream for stream in streams if stream.is_cold()]
+
+        if not hot_streams or not cold_streams:
+            return '与熱流体および受熱流体は少なくとも1つは指定する必要があります。'
+
+        hot_maximum_temp = max(stream.input_temperature() for stream in hot_streams)
+        hot_minimum_temp = min(stream.output_temperature() for stream in hot_streams)
+        cold_maximum_temp = max(stream.output_temperature() for stream in cold_streams)
+        cold_minimum_temp = min(stream.input_temperature() for stream in cold_streams)
+
+        # 与熱流体の最高温度 ≤ 受熱流体の最低温度は解析不可能。必ず検証する必要あり。
+        if hot_maximum_temp <= cold_minimum_temp:
+            return '与熱流体の最高温度が受熱流体の最低温度を下回っています。'
+
+        # 与熱流体の最低温度と受熱流体の最低温度、与熱流体の最高温度と受熱流体の最高温度の関係
+        # を検証。必ず検証する必要なし。
+        if not ignore_validation:
+            if hot_minimum_temp - cold_minimum_temp < 0:
+                return (
+                    '与熱流体の最低温度が受熱流体の最低温度を下回っています。'
+                    f'与熱流体最低温度: {hot_minimum_temp:.3f} ℃ '
+                    f'受熱流体最低温度: {cold_minimum_temp:.3f} ℃'
+                )
+
+            if hot_maximum_temp - cold_maximum_temp < 0:
+                return (
+                    '与熱流体の最高温度が受熱流体の最高温度を下回っています。'
+                    f'与熱流体最高温度: {hot_maximum_temp:.3f} ℃ '
+                    f'受熱流体最高温度: {cold_maximum_temp:.3f} ℃'
+                )
+
+        return ''
 
     def create_grand_composite_curve(self) -> tuple[list[float], list[float]]:
         """グランドコンポジットカーブを描くために必要な熱量と温度を返します。
