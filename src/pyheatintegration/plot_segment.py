@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import uuid
 from collections.abc import Iterable
 from typing import Optional
@@ -50,6 +51,7 @@ class PlotSegment:
 
         self.state = state
         self.reboiler_or_reactor = reboiler_or_reactor
+        self.slope = self.temperature_range.delta / self.heat_range.delta
 
     def __str__(self) -> str:
         return (
@@ -218,11 +220,9 @@ class PlotSegment:
         if not self.contain_heat(heat):
             raise ValueError('heatを含んでいる必要があります。')
 
-        heat_left, heat_right = self.heat_range()
-        temp_left, temp_right = self.temperature_range()
-
-        slope = (temp_right - temp_left) / (heat_right - heat_left)
-        return slope * (heat - heat_left) + temp_left
+        heat_left, _ = self.heat_range()
+        temp_left, _ = self.temperature_range()
+        return self.slope * (heat - heat_left) + temp_left
 
     def heat_at_temperature(self, temperature: float) -> float:
         """ある温度をとる熱量を返します。
@@ -236,11 +236,9 @@ class PlotSegment:
         if not self.contain_temperature(temperature):
             raise ValueError('temperatureを含んでいる必要があります。')
 
-        heat_left, heat_right = self.heat_range()
-        temp_left, temp_right = self.temperature_range()
-
-        slope = (temp_right - temp_left) / (heat_right - heat_left)
-        return 1 / slope * (temperature - temp_left) + heat_left
+        heat_left, _ = self.heat_range()
+        temp_left, _ = self.temperature_range()
+        return 1 / self.slope * (temperature - temp_left) + heat_left
 
     def shift_heat(self, delta: float) -> None:
         """熱量をずらします。
@@ -249,6 +247,7 @@ class PlotSegment:
             delta (float): ずらす値。
         """
         self.heat_range.shift(delta)
+        self.slope = self.temperature_range.delta / self.heat_range.delta
 
     def mergiable(self, other: PlotSegment) -> bool:
         """プロットセグメントを結合可能かを返します。
@@ -261,7 +260,8 @@ class PlotSegment:
         """
         return (self.uuid == other.uuid) \
             and (self.finish_heat() == other.start_heat()) \
-            and (self.finish_temperature() == other.start_temperature())
+            and (self.finish_temperature() == other.start_temperature()) \
+            and math.isclose(self.slope, other.slope)
 
     def merge(self, other: PlotSegment) -> PlotSegment:
         """プロットセグメントを結合します。
