@@ -51,7 +51,10 @@ class PlotSegment:
 
         self.state = state
         self.reboiler_or_reactor = reboiler_or_reactor
-        self.slope = self.temperature_range.delta / self.heat_range.delta
+        try:
+            self.slope = self.temperature_range.delta / self.heat_range.delta
+        except ZeroDivisionError:
+            self.slope = math.inf
 
     def __str__(self) -> str:
         return (
