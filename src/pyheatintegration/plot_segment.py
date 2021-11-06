@@ -250,7 +250,10 @@ class PlotSegment:
             delta (float): ずらす値。
         """
         self.heat_range.shift(delta)
-        self.slope = self.temperature_range.delta / self.heat_range.delta
+        try:
+            self.slope = self.temperature_range.delta / self.heat_range.delta
+        except ZeroDivisionError:
+            self.slope = math.inf
 
     def mergiable(self, other: PlotSegment) -> bool:
         """プロットセグメントを結合可能かを返します。
