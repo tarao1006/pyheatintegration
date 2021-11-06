@@ -4,12 +4,14 @@ from copy import copy, deepcopy
 from typing import Optional
 
 from .heat_range import (REL_TOL_DIGIT, HeatRange, flatten_heat_ranges,
-                         get_heat_ranges, get_merged_heat_ranges, merge_heat_range)
+                         get_heat_ranges, get_merged_heat_ranges,
+                         merge_heat_range)
 from .plot_segment import PlotSegment, get_plot_segments, is_continuous
 from .segment import Segment, Segments
 from .stream import Stream, get_temperature_range_heats
 from .temperature_range import (TemperatureRange, accumulate_heats,
-                                flatten_temperature_ranges, merge_temperature_range)
+                                flatten_temperature_ranges,
+                                merge_temperature_range)
 
 
 class TQDiagram:
