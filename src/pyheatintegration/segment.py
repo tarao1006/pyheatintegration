@@ -6,7 +6,7 @@ from .heat_range import (REL_TOL_DIGIT, HeatRange, flatten_heat_ranges,
                          get_heat_ranges)
 from .line import Line
 from .plot_segment import PlotSegment, get_plot_segments, temp_diff
-from .stream import Stream
+from .streams import Stream
 from .temperature_range import TemperatureRange
 
 

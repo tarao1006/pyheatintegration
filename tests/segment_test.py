@@ -4,7 +4,7 @@ from src.pyheatintegration.enums import StreamType
 from src.pyheatintegration.heat_range import HeatRange
 from src.pyheatintegration.plot_segment import PlotSegment
 from src.pyheatintegration.segment import Segment
-from src.pyheatintegration.stream import Stream
+from src.pyheatintegration.streams import Stream
 
 
 class TeseSegment(unittest.TestCase):

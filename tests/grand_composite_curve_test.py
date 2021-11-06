@@ -2,7 +2,7 @@ import unittest
 from collections import defaultdict
 
 from src.pyheatintegration.grand_composite_curve import GrandCompositeCurve, _get_lacking_heats, _get_heats
-from src.pyheatintegration.stream import Stream, get_temperature_range_streams
+from src.pyheatintegration.streams import Stream, get_temperature_range_streams
 from src.pyheatintegration.temperature_range import TemperatureRange
 
 

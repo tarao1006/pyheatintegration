@@ -7,7 +7,7 @@ from .heat_exchanger import HeatExchanger
 from .heat_range import HeatRange, get_merged_heat_ranges
 from .line import Line
 from .plot_segment import PlotSegment, get_plot_segments
-from .stream import Stream
+from .streams import Stream
 from .tq_diagram import TQDiagram, get_possible_minimum_temp_diff_range
 
 

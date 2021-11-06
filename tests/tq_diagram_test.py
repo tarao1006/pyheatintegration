@@ -2,7 +2,7 @@ import unittest
 
 from src.pyheatintegration.enums import StreamType
 from src.pyheatintegration.plot_segment import PlotSegment
-from src.pyheatintegration.stream import Stream
+from src.pyheatintegration.streams import Stream
 from src.pyheatintegration.tq_diagram import (
     _create_composite_curve, get_possible_minimum_temp_diff_range)
 

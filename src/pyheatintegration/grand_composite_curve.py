@@ -1,7 +1,7 @@
 from collections import defaultdict
 from copy import deepcopy
 
-from .stream import Stream, get_temperature_range_streams
+from .streams import Stream, get_temperature_range_streams
 from .temperature_range import TemperatureRange, flatten_temperature_ranges
 
 

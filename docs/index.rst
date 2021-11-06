@@ -85,7 +85,7 @@ Quick Start
   pinch_analyzer
   grand_composite_curve
   tq_diagram
-  stream
+  streams
   heat_exchanger
   enums
 

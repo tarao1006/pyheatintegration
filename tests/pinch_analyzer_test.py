@@ -1,7 +1,7 @@
 import unittest
 
 from src.pyheatintegration.pinch_analyzer import PinchAnalyzer
-from src.pyheatintegration.stream import Stream
+from src.pyheatintegration.streams import Stream
 
 
 class TestPinchAnalyzer(unittest.TestCase):
