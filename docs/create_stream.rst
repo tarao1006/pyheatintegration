@@ -4,11 +4,11 @@ Step1. Create Stream
 熱交換を行いたい流体の情報を元に、 ``Stream`` のリストを生成します。 ``Stream`` のコンスト\
 ラクタは、以下のようになっています。
 
-.. py:class:: Stream(input_temperature: float, output_temperature: float, heat_flow: float, type_: StreamType = <StreamType.AUTO: 5>, state: StreamState = <StreamState.UNKNOWN: 5>, cost: float = 0.0, reboiler_or_reactor: bool = False, id_: str = '')
+.. py:class:: Stream(input_temperature: float, output_temperature: float, heat_load: float, type_: StreamType = <StreamType.AUTO: 5>, state: StreamState = <StreamState.UNKNOWN: 5>, cost: float = 0.0, reboiler_or_reactor: bool = False, id_: str = '')
 
 * ``input_temperature (float)``: 入り口温度 [℃]
 * ``output_temperature (float)``: 出口温度 [℃]
-* ``heat_flow (float)``: 熱量 [W]
+* ``heat_load (float)``: 熱量 [W]
 * ``type_ (StreamType, optional)``: 流体の種類
 
   * ``StreamType.COLD``: 受熱
@@ -47,7 +47,7 @@ Step1. Create Stream
 受熱流体は ``input_temperature ≤ output_temperature`` 、与熱流体は
 ``input_temperature ≥ output_temperature`` である必要があります。等温流体の設定も可能で\
 す。外部流体の熱量は、グランドコンポジットカーブ作成時に決定するため、流体作成時には
-``heat_flow = 0`` を指定してください。
+``heat_load = 0`` を指定してください。
 
 流体の種類
 -----------

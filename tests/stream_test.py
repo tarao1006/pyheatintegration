@@ -10,12 +10,12 @@ from src.pyheatintegration.temperature_range import TemperatureRange
 
 class TestStream(unittest.TestCase):
 
-    def test_zero_heat_flow(self):
+    def test_zero_heat_load(self):
         with self.assertRaises(InvalidStreamError):
             Stream(0.0, 10.0, 0.0, StreamType(1))
             Stream(0.0, 10.0, 0.0, StreamType(2))
 
-    def test_nonzero_heat_flow(self):
+    def test_nonzero_heat_load(self):
         with self.assertRaises(InvalidStreamError):
             Stream(0.0, 10.0, 10.0, StreamType(3))
             Stream(0.0, 10.0, 10.0, StreamType(4))
@@ -64,7 +64,7 @@ class TestGetTemperatureRangeStreams(unittest.TestCase):
                 expected_stream = expected_streams[i]
 
                 self.assertEqual(result_stream.temperature_range, expected_stream.temperature_range)
-                self.assertEqual(result_stream.heat_flow, expected_stream.heat_flow)
+                self.assertEqual(result_stream.heat_load, expected_stream.heat_load)
                 self.assertEqual(result_stream.type_, expected_stream.type_)
 
 

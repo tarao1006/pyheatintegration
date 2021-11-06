@@ -12,7 +12,7 @@ def main():
         Stream(
             row.input_temperature,
             row.output_temperature,
-            row.heat_flow,
+            row.heat_load,
             StreamType(row.type),
             StreamState(row.state),
             cost=row.cost,

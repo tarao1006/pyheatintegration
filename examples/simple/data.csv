@@ -1,4 +1,4 @@
-id,input_temperature,output_temperature,heat_flow,type,state,cost,reboiler_or_reactor
+id,input_temperature,output_temperature,heat_load,type,state,cost,reboiler_or_reactor
 a,40.0,90.0,150.0,1,1,0,
 b,80.0,110.0,180.0,1,1,0,
 A,125.0,80.0,180.0,2,1,0,

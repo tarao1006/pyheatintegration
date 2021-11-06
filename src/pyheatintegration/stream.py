@@ -16,7 +16,7 @@ class Stream:
     Args:
         input_temperature (float): 入り口温度 [℃]。
         output_temperature (float): 出口温度 [℃]。
-        heat_flow (float): 熱量 [W]。
+        heat_load (float): 熱量 [W]。
         type\_ (StreamType): 流体の種類。
         state (StreamState): 流体の状態。
         cost (float): 流体のコスト [円/J]。外部流体の場合のみ設定可能。
@@ -26,7 +26,7 @@ class Stream:
     Attributes:
         id_ (str): 流体を区別する識別子。
         temperature_range　(TemperatureRange): 温度範囲。
-        heat_flow (float): 熱量 [W]。
+        heat_load (float): 熱量 [W]。
         cost (float): コスト [円/J]。
         type_ (StreamType): 流体の種類。
         state　(StreamState): 流体の状態。
@@ -53,7 +53,7 @@ class Stream:
         self,
         input_temperature: float,
         output_temperature: float,
-        heat_flow: float,
+        heat_load: float,
         type_: StreamType = StreamType.AUTO,
         state: StreamState = StreamState.UNKNOWN,
         cost: float = 0.0,
@@ -77,16 +77,16 @@ class Stream:
         else:
             self.type_ = type_
 
-        if self.is_internal() and heat_flow == 0:
+        if self.is_internal() and heat_load == 0:
             raise InvalidStreamError(
                 "外部流体でない流体の熱量の入力値は0でない必要があります。"
-                f"流体の種類: {self.type_.describe()} 熱量: {heat_flow}"
+                f"流体の種類: {self.type_.describe()} 熱量: {heat_load}"
             )
 
-        if self.is_external() and heat_flow != 0:
+        if self.is_external() and heat_load != 0:
             raise InvalidStreamError(
                 "外部流体の熱量の入力値は0である必要があります。"
-                f"流体の種類: {self.type_.describe()} 熱量: {heat_flow}"
+                f"流体の種類: {self.type_.describe()} 熱量: {heat_load}"
             )
 
         if self.is_cold() and input_temperature > output_temperature:
@@ -117,7 +117,7 @@ class Stream:
             input_temperature,
             output_temperature
         )
-        self.heat_flow = heat_flow
+        self.heat_load = heat_load
 
         self.state = state
 
@@ -137,7 +137,7 @@ class Stream:
             f'Stream('
             f'{self.input_temperature()}, '
             f'{self.output_temperature()}, '
-            f'{self.heat_flow}, '
+            f'{self.heat_load}, '
             f'type_={self.type_}, '
             f'state={self.state}, '
             f'cost={self.cost}, '
@@ -151,7 +151,7 @@ class Stream:
             f'{self.type_.describe()}, '
             f'input [℃]: {self.input_temperature()}, '
             f'output [℃]: {self.output_temperature()}, '
-            f'heat flow [W]: {self.heat_flow}'
+            f'heat flow [W]: {self.heat_load}'
         )
 
     def __format__(self, format_spec: str) -> str:
@@ -160,7 +160,7 @@ class Stream:
             f'{description},{"":{14 - len(description)}s}'
             f'input [℃]: {self.input_temperature().__format__(format_spec)}, '
             f'output [℃]: {self.output_temperature().__format__(format_spec)}, '
-            f'heat flow [W]: {self.heat_flow.__format__(format_spec)}'
+            f'heat flow [W]: {self.heat_load.__format__(format_spec)}'
         )
 
     def sort_key(self) -> float:
@@ -249,7 +249,7 @@ class Stream:
         Returns:
             float: 熱量 [W]。
         """
-        return self.heat_flow
+        return self.heat_load
 
     def temperatures(self) -> tuple[float, float]:
         """入り口温度と出口温度を返します。
@@ -314,15 +314,15 @@ class Stream:
         old_temp_delta = self.temperature_range.delta
         self.temperature_range = TemperatureRange(input_temperature, output_temperature)
 
-        self.heat_flow = self.heat() * self.temperature_range.delta / old_temp_delta
+        self.heat_load = self.heat() * self.temperature_range.delta / old_temp_delta
 
-    def update_heat(self, heat_flow: float) -> None:
+    def update_heat(self, heat_load: float) -> None:
         """熱量を更新します。
 
         入り口温度と出口温度が異なる流体に対しては呼び出せません。
 
         Args:
-            heat_flow (float): 更新する熱量。
+            heat_load (float): 更新する熱量。
 
         Raises:
             ValueError: 等温流体以外に対して熱量を更新しようとした場合。
@@ -330,7 +330,7 @@ class Stream:
         if self.is_internal() and not self.is_isothermal():
             raise ValueError("非等温流体は入り口温度・出口温度を変更せずに熱量を変更できません。")
 
-        self.heat_flow = heat_flow
+        self.heat_load = heat_load
 
 
 def get_temperature_range_streams(
