@@ -134,6 +134,7 @@ class GrandCompositeCurve:
                or (stream.is_cold() and target_temperature > pinch_point_temp):
                 continue
 
+            is_finished = False
             for i in range(len(heats)):
                 if i == len(heats) - 1:
                     # 与熱流体の場合は、流体温度がtemps[i]よりも大きい時、受熱流体の場合は、
@@ -141,6 +142,7 @@ class GrandCompositeCurve:
                     if (stream.is_hot() and target_temperature >= temps[i]) \
                        or (stream.is_cold() and target_temperature <= temps[i]):
                         stream.update_heat(not_heated)
+                        is_finished = True
                         break
                 start_temp = temps[i]
                 finish_temp = temps[i + 1]
@@ -160,6 +162,8 @@ class GrandCompositeCurve:
                     heated += heat
                     not_heated -= heat
                     break
+            if is_finished:
+                break
 
         return streams
 
