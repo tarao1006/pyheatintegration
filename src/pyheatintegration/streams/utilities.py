@@ -1,5 +1,4 @@
-from .streams import Stream, StreamType, StreamState
-
+from .streams import Stream, StreamState, StreamType
 
 # Some streams are provided as default on process design contest.
 # See http://scejcontest.chem-eng.kyushu-u.ac.jp/2021/download/processsim2021_v2.pdf.
