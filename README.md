@@ -5,7 +5,7 @@
 
 Help pinch point analysis. This package can draw grand composite curve and some kind of TQ diagram.
 
-Web site: https://tarao1006.github.io/pyheatintegration-frontend/
+Web site: https://pyheatintegration.vercel.app/
 
 - Grand Composite Curve
 <img src="https://raw.githubusercontent.com/tarao1006/pyheatintegration/main/examples/simple/grand_composite_curve.png" width="400">
